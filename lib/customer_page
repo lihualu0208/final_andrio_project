@@ -1,0 +1,293 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+
+/// Represents a customer model with basic information.
+class Customer {
+  int? id;
+  String firstName;
+  String lastName;
+  String address;
+  DateTime birthday;
+
+  Customer({
+    this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.address,
+    required this.birthday,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'address': address,
+      'birthday': birthday.toIso8601String(),
+    };
+  }
+
+  factory Customer.fromMap(Map<String, dynamic> map) {
+    return Customer(
+      id: map['id'],
+      firstName: map['firstName'],
+      lastName: map['lastName'],
+      address: map['address'],
+      birthday: DateTime.parse(map['birthday']),
+    );
+  }
+}
+
+/// Manages local database operations for Customer records.
+class CustomerDatabase {
+  static final CustomerDatabase instance = CustomerDatabase._init();
+  static Database? _database;
+
+  CustomerDatabase._init();
+
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDB('customers.db');
+    return _database!;
+  }
+
+  Future<Database> _initDB(String filePath) async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, filePath);
+
+    return await openDatabase(path, version: 1, onCreate: _createDB);
+  }
+
+  Future _createDB(Database db, int version) async {
+    await db.execute('''
+      CREATE TABLE customers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        firstName TEXT NOT NULL,
+        lastName TEXT NOT NULL,
+        address TEXT NOT NULL,
+        birthday TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> insertCustomer(Customer customer) async {
+    final db = await instance.database;
+    await db.insert('customers', customer.toMap());
+  }
+
+  Future<List<Customer>> getCustomers() async {
+    final db = await instance.database;
+    final result = await db.query('customers');
+    return result.map((json) => Customer.fromMap(json)).toList();
+  }
+
+  Future<void> updateCustomer(Customer customer) async {
+    final db = await instance.database;
+    await db.update(
+      'customers',
+      customer.toMap(),
+      where: 'id = ?',
+      whereArgs: [customer.id],
+    );
+  }
+
+  Future<void> deleteCustomer(int id) async {
+    final db = await instance.database;
+    await db.delete(
+      'customers',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+}
+
+/// Main page widget for managing customers.
+class CustomerPage extends StatefulWidget {
+  const CustomerPage({Key? key}) : super(key: key);
+
+  @override
+  State<CustomerPage> createState() => _CustomerPageState();
+}
+
+class _CustomerPageState extends State<CustomerPage> {
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController birthdayController = TextEditingController();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+
+  List<Customer> customers = [];
+  Customer? selectedCustomer;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCustomers();
+    _loadLastCustomer();
+  }
+
+  Future<void> _loadCustomers() async {
+    final list = await CustomerDatabase.instance.getCustomers();
+    setState(() => customers = list);
+  }
+
+  Future<void> _saveLastCustomer() async {
+    final customer = Customer(
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+      address: addressController.text,
+      birthday: DateTime.parse(birthdayController.text),
+    );
+    await secureStorage.write(key: 'lastCustomer', value: jsonEncode(customer.toMap()));
+  }
+
+  Future<void> _loadLastCustomer() async {
+    final jsonString = await secureStorage.read(key: 'lastCustomer');
+    if (jsonString != null) {
+      final map = jsonDecode(jsonString);
+      final customer = Customer.fromMap(map);
+      setState(() {
+        firstNameController.text = customer.firstName;
+        lastNameController.text = customer.lastName;
+        addressController.text = customer.address;
+        birthdayController.text = customer.birthday.toIso8601String();
+      });
+    }
+  }
+
+  void _addCustomer() async {
+    if (firstNameController.text.isEmpty ||
+        lastNameController.text.isEmpty ||
+        addressController.text.isEmpty ||
+        birthdayController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Missing Information'),
+          content: const Text('Please fill in all fields.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+        ),
+      );
+      return;
+    }
+    final customer = Customer(
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+      address: addressController.text,
+      birthday: DateTime.parse(birthdayController.text),
+    );
+    await CustomerDatabase.instance.insertCustomer(customer);
+    _saveLastCustomer();
+    _loadCustomers();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Customer added!')),
+    );
+  }
+
+  void _updateCustomer() async {
+    if (selectedCustomer == null) return;
+    selectedCustomer!.firstName = firstNameController.text;
+    selectedCustomer!.lastName = lastNameController.text;
+    selectedCustomer!.address = addressController.text;
+    selectedCustomer!.birthday = DateTime.parse(birthdayController.text);
+    await CustomerDatabase.instance.updateCustomer(selectedCustomer!);
+    _loadCustomers();
+  }
+
+  void _deleteCustomer() async {
+    if (selectedCustomer == null) return;
+    await CustomerDatabase.instance.deleteCustomer(selectedCustomer!.id!);
+    selectedCustomer = null;
+    _loadCustomers();
+  }
+
+  void _selectCustomer(Customer customer) {
+    setState(() {
+      selectedCustomer = customer;
+      firstNameController.text = customer.firstName;
+      lastNameController.text = customer.lastName;
+      addressController.text = customer.address;
+      birthdayController.text = customer.birthday.toIso8601String();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Customer List'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Instructions'),
+                content: const Text('Add a customer by filling the form and tapping Submit. Select a customer to update or delete.'),
+                actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth > 600;
+          return isWide
+              ? Row(
+                  children: [
+                    Expanded(child: _buildCustomerList()),
+                    Expanded(child: _buildCustomerForm()),
+                  ],
+                )
+              : Column(
+                  children: [
+                    Expanded(child: _buildCustomerList()),
+                    _buildCustomerForm(),
+                  ],
+                );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCustomerList() {
+    return ListView.builder(
+      itemCount: customers.length,
+      itemBuilder: (context, index) {
+        final customer = customers[index];
+        return ListTile(
+          title: Text('${customer.firstName} ${customer.lastName}'),
+          onTap: () => _selectCustomer(customer),
+        );
+      },
+    );
+  }
+
+  Widget _buildCustomerForm() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          TextField(controller: firstNameController, decoration: const InputDecoration(labelText: 'First Name')),
+          TextField(controller: lastNameController, decoration: const InputDecoration(labelText: 'Last Name')),
+          TextField(controller: addressController, decoration: const InputDecoration(labelText: 'Address')),
+          TextField(controller: birthdayController, decoration: const InputDecoration(labelText: 'Birthday (YYYY-MM-DD)')),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              ElevatedButton(onPressed: _addCustomer, child: const Text('Submit')),
+              const SizedBox(width: 10),
+              ElevatedButton(onPressed: _updateCustomer, child: const Text('Update')),
+              const SizedBox(width: 10),
+              ElevatedButton(onPressed: _deleteCustomer, child: const Text('Delete')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
