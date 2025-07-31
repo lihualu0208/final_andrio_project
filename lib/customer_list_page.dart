@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'customer.dart';
 import 'customer_dao.dart';
 import 'customer_repository.dart';
+import 'customr_AppLocalizations.dart';
+import 'customer_locale_provider.dart';
 
 class CustomerListPage extends StatefulWidget {
   final CustomerDao customerDao;
@@ -14,13 +17,14 @@ class CustomerListPage extends StatefulWidget {
 class _CustomerListPageState extends State<CustomerListPage> {
   final CustomerRepository _customerRepo = CustomerRepository();
   final List<Customer> _customers = [];
-  bool _hasLastCustomer = false;
+  bool _hasPreviousCustomer = false;
+  Customer? _selectedCustomer;
 
   @override
   void initState() {
     super.initState();
     _loadCustomers();
-    _checkLastCustomer();
+    _checkPreviousCustomer();
   }
 
   Future<void> _loadCustomers() async {
@@ -31,28 +35,194 @@ class _CustomerListPageState extends State<CustomerListPage> {
     });
 
     final maxId = await widget.customerDao.findMaxId();
-    if (maxId != null) {
-      Customer.currentId = maxId + 1;
-    } else {
-      Customer.currentId = 1;
-    }
+    Customer.currentId = (maxId ?? 0) + 1;
   }
 
-  Future<void> _checkLastCustomer() async {
+  Future<void> _checkPreviousCustomer() async {
     await _customerRepo.loadData();
     setState(() {
-      _hasLastCustomer = _customerRepo.firstName.isNotEmpty &&
-          _customerRepo.lastName.isNotEmpty;
+      _hasPreviousCustomer = _customerRepo.firstName.isNotEmpty;
     });
   }
 
-  void _showAddCustomerDialog({bool useLastCustomer = false}) {
-    final TextEditingController firstNameController = TextEditingController();
-    final TextEditingController lastNameController = TextEditingController();
-    final TextEditingController addressController = TextEditingController();
-    final TextEditingController birthdayController = TextEditingController();
+  Widget _reactiveLayout() {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
 
-    if (useLastCustomer && _hasLastCustomer) {
+    if ((width > height) && (width > 720)) {
+      return Row(
+        children: [
+          Expanded(flex: 1, child: _buildCustomerList()),
+          Expanded(
+            flex: 1,
+            child: _selectedCustomer == null
+                ? Center(child: Text(AppLocalizations.of(context)!.translate('selectCustomer')))
+                : _buildCustomerDetails(_selectedCustomer!),
+          ),
+        ],
+      );
+    } else {
+      return _selectedCustomer == null
+          ? _buildCustomerList()
+          : _buildCustomerDetails(_selectedCustomer!);
+    }
+  }
+
+  Widget _buildCustomerList() {
+    return ListView.builder(
+      itemCount: _customers.length,
+      itemBuilder: (context, index) {
+        final customer = _customers[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ListTile(
+            title: Text('${customer.firstName} ${customer.lastName}'),
+            subtitle: Text(customer.address),
+            onTap: () => setState(() => _selectedCustomer = customer),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCustomerDetails(Customer customer) {
+    final loc = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('${loc.translate('firstName')}: ${customer.firstName}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          Text('${loc.translate('lastName')}: ${customer.lastName}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          Text('${loc.translate('address')}: ${customer.address}',
+              style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 12),
+          Text('${loc.translate('birthday')}: ${customer.birthday}',
+              style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () => _showEditCustomerDialog(customer),
+                child: Text(loc.translate('update')),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await widget.customerDao.deleteCustomer(customer);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${loc.translate('customerDeleted')}: ${customer.firstName} ${customer.lastName}')),
+                    );
+                    _loadCustomers();
+                    setState(() => _selectedCustomer = null);
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: Text(loc.translate('delete'),
+                    style: const TextStyle(color: Colors.white)),
+              ),
+              if (!(MediaQuery.of(context).size.width > 720))
+                ElevatedButton(
+                  onPressed: () => setState(() => _selectedCustomer = null),
+                  child: Text(loc.translate('back')),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageDialog() {
+    final loc = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(loc.translate('language')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(loc.translate('english')),
+              onTap: () {
+                Provider.of<LocaleProvider>(context, listen: false)
+                    .setLocale(const Locale('en'));
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text(loc.translate('chinese')),
+              onTap: () {
+                Provider.of<LocaleProvider>(context, listen: false)
+                    .setLocale(const Locale('zh'));
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(loc.translate('appTitle')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: _showLanguageDialog,
+            tooltip: loc.translate('language'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: _showInstructions,
+            tooltip: loc.translate('instructionsTitle'),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: _reactiveLayout(),
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: 'add_customer',
+            onPressed: () => _showAddCustomerDialog(),
+            child: const Icon(Icons.add),
+          ),
+          if (_hasPreviousCustomer) ...[
+            const SizedBox(height: 10),
+            FloatingActionButton(
+              heroTag: 'copy_previous',
+              onPressed: () => _showAddCustomerDialog(usePrevious: true),
+              child: const Icon(Icons.content_copy),
+              tooltip: loc.translate('usePrevious'),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showAddCustomerDialog({bool usePrevious = false}) {
+    final loc = AppLocalizations.of(context)!;
+    final firstNameController = TextEditingController();
+    final lastNameController = TextEditingController();
+    final addressController = TextEditingController();
+    final birthdayController = TextEditingController();
+
+    if (usePrevious && _hasPreviousCustomer) {
       firstNameController.text = _customerRepo.firstName;
       lastNameController.text = _customerRepo.lastName;
       addressController.text = _customerRepo.address;
@@ -62,25 +232,41 @@ class _CustomerListPageState extends State<CustomerListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add New Customer'),
+        title: Text(loc.translate('addCustomer')),
         content: SingleChildScrollView(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: firstNameController,
-                decoration: const InputDecoration(labelText: 'First Name'),
+                decoration: InputDecoration(
+                  labelText: loc.translate('firstName'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
+              const SizedBox(height: 16),
               TextField(
                 controller: lastNameController,
-                decoration: const InputDecoration(labelText: 'Last Name'),
+                decoration: InputDecoration(
+                  labelText: loc.translate('lastName'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
+              const SizedBox(height: 16),
               TextField(
                 controller: addressController,
-                decoration: const InputDecoration(labelText: 'Address'),
+                decoration: InputDecoration(
+                  labelText: loc.translate('address'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
+              const SizedBox(height: 16),
               TextField(
                 controller: birthdayController,
-                decoration: const InputDecoration(labelText: 'Birthday (YYYY-MM-DD)'),
+                decoration: InputDecoration(
+                  labelText: loc.translate('birthday'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
             ],
           ),
@@ -88,7 +274,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(loc.translate('cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -99,7 +285,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
 
               if (firstName.isEmpty || lastName.isEmpty || address.isEmpty || birthday.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('All fields are required')),
+                  SnackBar(content: Text(loc.translate('allFieldsRequired'))),
                 );
                 return;
               }
@@ -123,47 +309,64 @@ class _CustomerListPageState extends State<CustomerListPage> {
               if (mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('$firstName $lastName added successfully')),
+                  SnackBar(content: Text('${loc.translate('customerAdded')}: $firstName $lastName')),
                 );
                 _loadCustomers();
-                _checkLastCustomer();
+                _checkPreviousCustomer();
               }
             },
-            child: const Text('Add'),
+            child: Text(loc.translate('save')),
           ),
         ],
       ),
     );
   }
 
-  void _showCustomerDetails(Customer customer) {
-    final TextEditingController firstNameController = TextEditingController(text: customer.firstName);
-    final TextEditingController lastNameController = TextEditingController(text: customer.lastName);
-    final TextEditingController addressController = TextEditingController(text: customer.address);
-    final TextEditingController birthdayController = TextEditingController(text: customer.birthday);
+  void _showEditCustomerDialog(Customer customer) {
+    final loc = AppLocalizations.of(context)!;
+    final firstNameController = TextEditingController(text: customer.firstName);
+    final lastNameController = TextEditingController(text: customer.lastName);
+    final addressController = TextEditingController(text: customer.address);
+    final birthdayController = TextEditingController(text: customer.birthday);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Customer Details'),
+        title: Text(loc.translate('editCustomer')),
         content: SingleChildScrollView(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: firstNameController,
-                decoration: const InputDecoration(labelText: 'First Name'),
+                decoration: InputDecoration(
+                  labelText: loc.translate('firstName'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
+              const SizedBox(height: 16),
               TextField(
                 controller: lastNameController,
-                decoration: const InputDecoration(labelText: 'Last Name'),
+                decoration: InputDecoration(
+                  labelText: loc.translate('lastName'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
+              const SizedBox(height: 16),
               TextField(
                 controller: addressController,
-                decoration: const InputDecoration(labelText: 'Address'),
+                decoration: InputDecoration(
+                  labelText: loc.translate('address'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
+              const SizedBox(height: 16),
               TextField(
                 controller: birthdayController,
-                decoration: const InputDecoration(labelText: 'Birthday (YYYY-MM-DD)'),
+                decoration: InputDecoration(
+                  labelText: loc.translate('birthday'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
             ],
           ),
@@ -171,7 +374,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(loc.translate('cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -194,28 +397,14 @@ class _CustomerListPageState extends State<CustomerListPage> {
               if (mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Customer updated successfully')),
+                  SnackBar(content: Text(loc.translate('customerUpdated'))),
                 );
                 _loadCustomers();
-                _checkLastCustomer();
+                _checkPreviousCustomer();
+                setState(() => _selectedCustomer = updatedCustomer);
               }
             },
-            child: const Text('Update'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await widget.customerDao.deleteCustomer(customer);
-              if (mounted) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${customer.firstName} ${customer.lastName} deleted')),
-                );
-                _loadCustomers();
-                _checkLastCustomer();
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(loc.translate('update')),
           ),
         ],
       ),
@@ -223,77 +412,23 @@ class _CustomerListPageState extends State<CustomerListPage> {
   }
 
   void _showInstructions() {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Instructions'),
-        content: const Text(
-          '1. Tap "Add Customer" to add a new customer\n'
-              '2. Select a customer from the list to view/edit details\n'
-              '3. Use the update button to save changes\n'
-              '4. Use the delete button to remove a customer\n'
-              '5. Use the copy button to copy last customer details',
+        title: Text(loc.translate('instructionsTitle')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(loc.translate('instructions')),
+          ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(loc.translate('gotIt')),
           ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Customer Management'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help),
-            onPressed: _showInstructions,
-          ),
-        ],
-      ),
-      body: _customers.isEmpty
-          ? const Center(child: Text('No customers found'))
-          : ListView.builder(
-        itemCount: _customers.length,
-        itemBuilder: (context, index) {
-          final customer = _customers[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              title: Text('${customer.firstName} ${customer.lastName}'),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(customer.address),
-                  Text('Birthday: ${customer.birthday}'),
-                ],
-              ),
-              onTap: () => _showCustomerDetails(customer),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag: 'add_customer',
-            onPressed: () => _showAddCustomerDialog(),
-            child: const Icon(Icons.add),
-          ),
-          const SizedBox(height: 10),
-          if (_hasLastCustomer)
-            FloatingActionButton(
-              heroTag: 'copy_last',
-              onPressed: () => _showAddCustomerDialog(useLastCustomer: true),
-              child: const Icon(Icons.content_copy),
-              tooltip: 'Use last customer data',
-            ),
         ],
       ),
     );
