@@ -1,3 +1,9 @@
+/// customer_main.dart
+/// The main entry point for the Customer Management application.
+///
+/// Initializes the database, sets up localization, and configures the
+/// MaterialApp with the appropriate providers and settings.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; // Essential import
 import 'package:provider/provider.dart';
@@ -29,9 +35,15 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
-  final CustomerDao customerDao;
+/// The root widget of the Customer Management application.
+///
+/// Configures the MaterialApp with localization support and theme settings,
+/// and sets the CustomerListPage as the home screen.
 
+class MyApp extends StatelessWidget {
+  /// The CustomerDao instance for database operations.
+  final CustomerDao customerDao;
+  /// Creates the root application widget.
   const MyApp({super.key, required this.customerDao});
 
   @override

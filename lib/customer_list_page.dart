@@ -1,3 +1,17 @@
+/// customer_list_page.dart
+/// The main page of the Customer Management application.
+///
+/// This widget provides functionality to:
+/// - View a list of all customers
+/// - Add new customers
+/// - Edit existing customers
+/// - Delete customers
+/// - View customer details in a responsive layout
+/// - Switch between languages (English/Chinese)
+///
+/// The layout adapts to different screen sizes, showing a side-by-side view
+/// on larger screens and a stacked view on smaller devices.
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'customer.dart';
@@ -7,12 +21,23 @@ import 'customr_AppLocalizations.dart';
 import 'customer_locale_provider.dart';
 
 class CustomerListPage extends StatefulWidget {
+  /// The [CustomerDao] instance used for database operations.
   final CustomerDao customerDao;
+  /// Creates a [CustomerListPage] with the given [customerDao].
+  ///
+  /// The [customerDao] must not be null.
   const CustomerListPage({super.key, required this.customerDao});
 
   @override
   State<CustomerListPage> createState() => _CustomerListPageState();
 }
+/// The state class for [CustomerListPage].
+///
+/// Manages:
+/// - The list of customers
+/// - The currently selected customer
+/// - The customer repository for temporary data storage
+/// - The responsive layout state
 
 class _CustomerListPageState extends State<CustomerListPage> {
   final CustomerRepository _customerRepo = CustomerRepository();
@@ -20,13 +45,18 @@ class _CustomerListPageState extends State<CustomerListPage> {
   bool _hasPreviousCustomer = false;
   Customer? _selectedCustomer;
 
+  /// Loads all customers from the database and updates the UI.
+  ///
+  /// Also sets the [Customer.currentId] to the next available ID.
   @override
   void initState() {
     super.initState();
     _loadCustomers();
     _checkPreviousCustomer();
   }
-
+  /// Loads all customers from the database and updates the UI.
+  ///
+  /// Also sets the [Customer.currentId] to the next available ID.
   Future<void> _loadCustomers() async {
     final customers = await widget.customerDao.findAllCustomers();
     setState(() {
@@ -37,7 +67,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
     final maxId = await widget.customerDao.findMaxId();
     Customer.currentId = (maxId ?? 0) + 1;
   }
-
+  /// Checks if there's previous customer data available to reuse.
   Future<void> _checkPreviousCustomer() async {
     await _customerRepo.loadData();
     setState(() {
@@ -45,6 +75,11 @@ class _CustomerListPageState extends State<CustomerListPage> {
     });
   }
 
+  /// Builds a responsive layout based on screen size.
+  ///
+  /// On large screens (width > height and width > 720), shows a side-by-side
+  /// view of the customer list and details. On smaller screens, shows either
+  /// the list or details view.
   Widget _reactiveLayout() {
     final size = MediaQuery.of(context).size;
     final width = size.width;
@@ -68,6 +103,10 @@ class _CustomerListPageState extends State<CustomerListPage> {
           : _buildCustomerDetails(_selectedCustomer!);
     }
   }
+  /// Builds a scrollable list of customers.
+  ///
+  /// Each customer is displayed in a [Card] with their name and address.
+  /// Tapping a customer selects it for viewing/editing.
 
   Widget _buildCustomerList() {
     return ListView.builder(
@@ -85,6 +124,12 @@ class _CustomerListPageState extends State<CustomerListPage> {
       },
     );
   }
+  /// Builds a detailed view of a customer.
+  ///
+  /// Displays all customer information and provides buttons for:
+  /// - Editing the customer
+  /// - Deleting the customer
+  /// - Returning to the list (on small screens)
 
   Widget _buildCustomerDetails(Customer customer) {
     final loc = AppLocalizations.of(context)!;
@@ -139,6 +184,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
     );
   }
 
+  /// Shows a dialog for selecting the application language.
   void _showLanguageDialog() {
     final loc = AppLocalizations.of(context)!;
     showDialog(
@@ -214,6 +260,11 @@ class _CustomerListPageState extends State<CustomerListPage> {
       ),
     );
   }
+
+  /// Shows a dialog for adding a new customer.
+  ///
+  /// If [usePrevious] is true, pre-fills the form with data from the last
+  /// saved customer.
 
   void _showAddCustomerDialog({bool usePrevious = false}) {
     final loc = AppLocalizations.of(context)!;
@@ -322,6 +373,8 @@ class _CustomerListPageState extends State<CustomerListPage> {
     );
   }
 
+  /// Shows a dialog for editing an existing customer.
+
   void _showEditCustomerDialog(Customer customer) {
     final loc = AppLocalizations.of(context)!;
     final firstNameController = TextEditingController(text: customer.firstName);
@@ -410,7 +463,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
       ),
     );
   }
-
+  /// Shows application instructions in a dialog.
   void _showInstructions() {
     final loc = AppLocalizations.of(context)!;
     showDialog(

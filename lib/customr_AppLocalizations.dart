@@ -1,19 +1,24 @@
+/// customr_AppLocalizations.dart
+/// Provides localized strings for the Customer Management application.
+///
+/// Supports English and Chinese localization. Strings are accessed via the
+/// [translate] method using string keys.
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/synchronous_future.dart';
 import 'package:flutter/foundation.dart'; // For SynchronousFuture
 
 class AppLocalizations {
   AppLocalizations(this.locale);
-
+  /// The current locale for which to provide localized strings.
   final Locale locale;
-
+  /// Returns the localized strings for the current context.
   static AppLocalizations? of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
-
+  /// The delegate for loading localized strings.
   static const LocalizationsDelegate<AppLocalizations> delegate =
   _AppLocalizationsDelegate();
-
+  /// A map of all localized strings, organized by language code.
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
       'appTitle': 'Customer Management',
@@ -79,16 +84,24 @@ class AppLocalizations {
     }
   };
 
+  /// Translates a string key to the current locale's version.
+  ///
+  /// Falls back to English if the key isn't found in the current locale.
+
   String translate(String key) {
     return _localizedValues[locale.languageCode]?[key] ??
         _localizedValues['en']?[key] ??
         key;
   }
-
+  /// The list of locales supported by the application.
   static List<Locale> get supportedLocales {
     return const [Locale('en'), Locale('zh')];
   }
 }
+/// A delegate for loading AppLocalizations.
+///
+/// This is used by Flutter's localization system to load the appropriate
+/// localized strings for the current locale.
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
