@@ -1,68 +1,15 @@
 import 'dart:ffi';
 import 'package:flutter/material.dart';
-
+import 'mainPage.dart';
 import 'package:my_flutter_labs/SalesDatabase.dart';
 import 'package:my_flutter_labs/SalesRecords.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+class SalesPage extends StatefulWidget {
+  @override State<SalesPage> createState() {return SalesPageState();}
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-
-
-
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class SalesPageState extends State<SalesPage> {
   late TextEditingController _controller0;
   late TextEditingController _controller1;
   late TextEditingController _controller2;
@@ -70,6 +17,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late TextEditingController _controller4;
   List<SalesRecords> records = [];
   late var daoObj;
+  SalesRecords? selectedItem;
 
 
 
@@ -106,17 +54,33 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
 
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text("Sales Page"),
+          actions: [
+
+            IconButton(onPressed: () {
+              showDialog(context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Instructions'),
+                    content: const Text('To use this page, please enter the ID\'s '
+                        'related to the customers, dealer, and car sold, alongside the'
+                        ' date of sale and a name for the sale record. After creating '
+                        'an entry using the button, clicking an entry will reveal a '
+                        'page detailing the features of the entry, as well as buttons '
+                        'to update or delete the entry . In addition, after '
+                        'adding an entry, you are given the option to keep the same '
+                        'features to autofill the text boxes to be reused next time you load the page.'),
+                    actions: <Widget>[
+                      ElevatedButton(onPressed: () {
+                        Navigator.pop(context);
+                      }, child: Text("Got it!"))
+                    ],));
+            },
+                icon: Icon(Icons.question_mark)),
+          ]
       ),
       body: Center(
         child: Padding(padding: EdgeInsets.all(20),
@@ -126,8 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
       ),
-    );// This trailing comma makes auto-formatting nicer for build methods.
-  }
+    );}
 
   Widget listPage(){
     return Column(children: [
@@ -262,7 +225,10 @@ class _MyHomePageState extends State<MyHomePage> {
       )
     ],);
   }
-
+  //
+  // Widget detailsPage(){
+  //
+  // }
 
 }
 
