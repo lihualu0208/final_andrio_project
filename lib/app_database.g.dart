@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'customer_app_database.dart';
+part of 'app_database.dart';
 
 // **************************************************************************
 // FloorGenerator
@@ -72,7 +72,7 @@ class _$AppDatabase extends AppDatabase {
     changeListener = listener ?? StreamController<String>.broadcast();
   }
 
-  CustomerDao? _customerDaoInstance;
+  DealershipDao? _dealershipDaoInstance;
 
   Future<sqflite.Database> open(
     String path,
@@ -96,7 +96,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `customers` (`id` INTEGER NOT NULL, `firstName` TEXT NOT NULL, `lastName` TEXT NOT NULL, `address` TEXT NOT NULL, `birthday` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `dealerships` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `address` TEXT NOT NULL, `city` TEXT NOT NULL, `postalCode` TEXT NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -105,47 +105,47 @@ class _$AppDatabase extends AppDatabase {
   }
 
   @override
-  CustomerDao get customerDao {
-    return _customerDaoInstance ??= _$CustomerDao(database, changeListener);
+  DealershipDao get dealershipDao {
+    return _dealershipDaoInstance ??= _$DealershipDao(database, changeListener);
   }
 }
 
-class _$CustomerDao extends CustomerDao {
-  _$CustomerDao(
+class _$DealershipDao extends DealershipDao {
+  _$DealershipDao(
     this.database,
     this.changeListener,
   )   : _queryAdapter = QueryAdapter(database),
-        _customerInsertionAdapter = InsertionAdapter(
+        _dealershipInsertionAdapter = InsertionAdapter(
             database,
-            'customers',
-            (Customer item) => <String, Object?>{
+            'dealerships',
+            (Dealership item) => <String, Object?>{
                   'id': item.id,
-                  'firstName': item.firstName,
-                  'lastName': item.lastName,
+                  'name': item.name,
                   'address': item.address,
-                  'birthday': item.birthday
+                  'city': item.city,
+                  'postalCode': item.postalCode
                 }),
-        _customerUpdateAdapter = UpdateAdapter(
+        _dealershipUpdateAdapter = UpdateAdapter(
             database,
-            'customers',
+            'dealerships',
             ['id'],
-            (Customer item) => <String, Object?>{
+            (Dealership item) => <String, Object?>{
                   'id': item.id,
-                  'firstName': item.firstName,
-                  'lastName': item.lastName,
+                  'name': item.name,
                   'address': item.address,
-                  'birthday': item.birthday
+                  'city': item.city,
+                  'postalCode': item.postalCode
                 }),
-        _customerDeletionAdapter = DeletionAdapter(
+        _dealershipDeletionAdapter = DeletionAdapter(
             database,
-            'customers',
+            'dealerships',
             ['id'],
-            (Customer item) => <String, Object?>{
+            (Dealership item) => <String, Object?>{
                   'id': item.id,
-                  'firstName': item.firstName,
-                  'lastName': item.lastName,
+                  'name': item.name,
                   'address': item.address,
-                  'birthday': item.birthday
+                  'city': item.city,
+                  'postalCode': item.postalCode
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -154,41 +154,42 @@ class _$CustomerDao extends CustomerDao {
 
   final QueryAdapter _queryAdapter;
 
-  final InsertionAdapter<Customer> _customerInsertionAdapter;
+  final InsertionAdapter<Dealership> _dealershipInsertionAdapter;
 
-  final UpdateAdapter<Customer> _customerUpdateAdapter;
+  final UpdateAdapter<Dealership> _dealershipUpdateAdapter;
 
-  final DeletionAdapter<Customer> _customerDeletionAdapter;
+  final DeletionAdapter<Dealership> _dealershipDeletionAdapter;
 
   @override
-  Future<List<Customer>> findAllCustomers() async {
-    return _queryAdapter.queryList('SELECT * FROM customers ORDER BY id ASC',
-        mapper: (Map<String, Object?> row) => Customer(
+  Future<List<Dealership>> findAllDealerships() async {
+    return _queryAdapter.queryList('SELECT * FROM dealerships ORDER BY id ASC',
+        mapper: (Map<String, Object?> row) => Dealership(
             id: row['id'] as int,
-            firstName: row['firstName'] as String,
-            lastName: row['lastName'] as String,
+            name: row['name'] as String,
             address: row['address'] as String,
-            birthday: row['birthday'] as String));
+            city: row['city'] as String,
+            postalCode: row['postalCode'] as String));
   }
 
   @override
   Future<int?> findMaxId() async {
-    return _queryAdapter.query('SELECT MAX(id) FROM customers',
+    return _queryAdapter.query('SELECT MAX(id) FROM dealerships',
         mapper: (Map<String, Object?> row) => row.values.first as int);
   }
 
   @override
-  Future<void> insertCustomer(Customer customer) async {
-    await _customerInsertionAdapter.insert(customer, OnConflictStrategy.abort);
+  Future<void> insertDealership(Dealership dealership) async {
+    await _dealershipInsertionAdapter.insert(
+        dealership, OnConflictStrategy.abort);
   }
 
   @override
-  Future<void> updateCustomer(Customer customer) async {
-    await _customerUpdateAdapter.update(customer, OnConflictStrategy.abort);
+  Future<void> updateDealership(Dealership dealership) async {
+    await _dealershipUpdateAdapter.update(dealership, OnConflictStrategy.abort);
   }
 
   @override
-  Future<void> deleteCustomer(Customer customer) async {
-    await _customerDeletionAdapter.delete(customer);
+  Future<void> deleteDealership(Dealership dealership) async {
+    await _dealershipDeletionAdapter.delete(dealership);
   }
 }
