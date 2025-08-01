@@ -1,6 +1,4 @@
-import 'dart:ffi';
 import 'package:flutter/material.dart';
-import 'mainPage.dart';
 import 'package:my_flutter_labs/SalesDatabase.dart';
 import 'package:my_flutter_labs/SalesRecords.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
