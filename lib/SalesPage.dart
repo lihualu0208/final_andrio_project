@@ -16,17 +16,32 @@ class SalesPageState extends State<SalesPage> {
   List<SalesRecords> records = [];
   late var daoObj;
   SalesRecords? selectedItem;
+  late TextEditingController _displayCustID;
+  late TextEditingController _displayTitle;
+  late TextEditingController _displayCarID;
+  late TextEditingController _displayDID;
+  late TextEditingController _displayDate;
+
 
 
 
   @override
   void initState() {
     super.initState();
+    //listpage controllers
     _controller0 = TextEditingController();
     _controller1 = TextEditingController();
     _controller2 = TextEditingController();
     _controller3 = TextEditingController();
     _controller4 = TextEditingController();
+    //display page controllers
+    _displayCustID = TextEditingController();
+    _displayTitle = TextEditingController();
+    _displayCarID = TextEditingController();
+    _displayDID = TextEditingController();
+    _displayDate = TextEditingController();
+
+
 
 
     $FloorSalesDatabase.databaseBuilder('final_database.db')
@@ -37,16 +52,56 @@ class SalesPageState extends State<SalesPage> {
         records = dbResults;
       });
 
-    } );
+    });
+
+    Future.delayed(Duration.zero, () async {
+      EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
+                            //set strings to hold ESP's
+      String prefsTitle = await prefs.getString("SalesPageTitle");
+      String prefsCustId = await prefs.getString("SalesPageCustID");
+      String prefsCarId = await prefs.getString("SalesPageCarID");
+      String prefsDId = await prefs.getString("SalesPageDID");
+      String prefsDate = await prefs.getString("SalesPageDate");
+
+      //if statements to check all prefs have values
+      //if NOT NULL, then
+      if (prefsTitle != "") {
+        if (prefsCustId != "") {
+          if (prefsCarId != ""){
+            if (prefsDId != ""){
+              if (prefsDate != ""){
+                setState(() {
+                  // set controllers text to EncrypSharPrefs
+                  //eg _controller1.text = username;
+                  _controller0.text = prefsTitle;
+                  _controller1.text = prefsCustId;
+                  _controller2.text = prefsCarId;
+                  _controller3.text = prefsDId;
+                  _controller4.text = prefsDate;
+                });
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
+    //listpage controllers
     _controller0.dispose();
     _controller1.dispose();
     _controller2.dispose();
     _controller3.dispose();
     _controller4.dispose();
+    //displayPage controllers
+    _displayTitle.dispose();
+    _displayCustID.dispose();
+    _displayCarID.dispose();
+    _displayDID.dispose();
+    _displayDate.dispose();
+
     super.dispose();
   }
 
@@ -63,14 +118,19 @@ class SalesPageState extends State<SalesPage> {
               showDialog(context: context,
                   builder: (BuildContext context) => AlertDialog(
                     title: const Text('Instructions'),
-                    content: const Text('To use this page, please enter the ID\'s '
-                        'related to the customers, dealer, and car sold, alongside the'
-                        ' date of sale and a name for the sale record. After creating '
-                        'an entry using the button, clicking an entry will reveal a '
-                        'page detailing the features of the entry, as well as buttons '
-                        'to update or delete the entry . In addition, after '
-                        'adding an entry, you are given the option to keep the same '
-                        'features to autofill the text boxes to be reused next time you load the page.'),
+                    content: const Text(
+                        'To use this page, please enter '
+                        'the ID\'s related to the customers, dealer, and car '
+                        'sold, alongside the date of sale (in format dd-mm-yyyy)'
+                            ' and a name for the '
+                        'sale record.\nAfter creating an entry using the button,'
+                        ' clicking an entry will reveal a page detailing the '
+                        'features of the entry, as well as buttons to update or '
+                        'delete the entry.\n In addition, after adding an entry,'
+                        ' you are given the option to keep the same features to '
+                        'autofill the text boxes to be reused next time you load'
+                        ' the page.'
+                    ),
                     actions: <Widget>[
                       ElevatedButton(onPressed: () {
                         Navigator.pop(context);
@@ -82,10 +142,9 @@ class SalesPageState extends State<SalesPage> {
       ),
       body: Center(
         child: Padding(padding: EdgeInsets.all(20),
-            child: listPage()
+            child: responsiveLayout()
 
         ),
-
 
       ),
     );}
@@ -95,6 +154,7 @@ class SalesPageState extends State<SalesPage> {
       Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children:[
+
             Expanded(child: TextField(
               controller: _controller0,
               decoration: InputDecoration(
@@ -138,26 +198,71 @@ class SalesPageState extends State<SalesPage> {
 
             ElevatedButton(
                 onPressed: () {
-                  var inputTitle = _controller0.value.text;
-                  var inputCustID = int.parse(_controller1.value.text);
-                  var inputCarID = int.parse(_controller2.value.text);
-                  var inputDealerID = int.parse(_controller3.value.text);
-                  var inputDate = _controller4.value.text;
+                  if (_controller0.text.trim().isEmpty ||
+                      _controller1.text.trim().isEmpty ||
+                      _controller2.text.trim().isEmpty ||
+                      _controller3.text.trim().isEmpty ||
+                      _controller4.text.trim().isEmpty){
+                          var popUp = SnackBar(
+                            content: Text("Please enter data for all fields "
+                                "before adding the record"),
+                            duration: Duration(seconds: 60),
+                            action: SnackBarAction(label: "OK", onPressed: () {
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();}),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(popUp);
+                  } else if (_controller0.text.trim().isNotEmpty ||
+                      _controller1.text.trim().isNotEmpty ||
+                      _controller2.text.trim().isNotEmpty ||
+                      _controller3.text.trim().isNotEmpty ||
+                      _controller4.text.trim().isEmpty){
+                            var inputTitle = _controller0.value.text;
+                            var inputCustID = _controller1.value.text;
+                            var inputCarID = _controller2.value.text;
+                            var inputDealerID = _controller3.value.text;
+                            var inputDate = _controller4.value.text;
+                            final prefs = EncryptedSharedPreferences();
+                            showDialog(context: context,
+                                builder: (BuildContext context) => AlertDialog(
 
-                  setState(() {
-                    var newRecord = SalesRecords(SalesRecords.ID++, inputTitle, inputCustID, inputCarID, inputDealerID, inputDate);
+                                  content: const Text('Would you like to save '
+                                      'these values for next time?'),
+                                  actions: <Widget>[
 
-                    daoObj.addSalesRecord(newRecord);
-                    records.add(newRecord);
+                                    ElevatedButton(onPressed: () {
+                                      prefs.setString("SalesPageTitle", inputTitle);
+                                      prefs.setString("SalesPageCustID", inputCustID);
+                                      prefs.setString("SalesPageCarID", inputCarID);
+                                      prefs.setString("SalesPageDID", inputDealerID);
+                                      prefs.setString("SalesPageDate", inputDate);
+                                      Navigator.pop(context);
+                                    }, child: Text("Yes")),
 
-
-                  });
-                  _controller0.text = "";
-                  _controller1.text = "";
-                  _controller2.text = "";
-                  _controller3.text = "";
-                  _controller4.text = "";
-
+                                    ElevatedButton(onPressed: () {
+                                      prefs.clear();
+                                      Navigator.pop(context);
+                                    }, child: Text("No"))
+                                  ],
+                                ));
+                            setState(() {
+                              var newRecord = SalesRecords(
+                                  SalesRecords.ID++,
+                                  inputTitle,
+                                  int.parse(inputCustID),
+                                  int.parse(inputCarID),
+                                  int.parse(inputDealerID),
+                                  inputDate
+                              );
+                              daoObj.addSalesRecord(newRecord);
+                              records.add(newRecord);
+                            });
+                            _controller0.text = "";
+                            _controller1.text = "";
+                            _controller2.text = "";
+                            _controller3.text = "";
+                            _controller4.text = "";
+                  }
 
                 },
                 child: Text("Add")
@@ -178,37 +283,12 @@ class SalesPageState extends State<SalesPage> {
 
             } else if (records.isNotEmpty){
               return GestureDetector(
-                  onLongPress: (){
+                  onTap: (){
                     setState(() {
-                      daoObj.removeSalesRecord(records[rowNumber]);
-                      records.removeAt(rowNumber);
+                      selectedItem = records[rowNumber];
                     });
-
-                    // showDialog(context: context, builder: (BuildContext context) => AlertDialog(
-                    //   title: Text("Would you like to autofill fields with those input?"),
-                    //   actions: <Widget>[
-                    //     Row(
-                    //       children: [
-                    //         ElevatedButton(
-                    //             onPressed: () {
-                    //                  final prefs = new EncryptedSharedPreferences();
-                    //               setState(() {
-                    //
-                    //               });
-                    //               Navigator.pop(context);
-                    //             },
-                    //             child: Text("Yes")),
-                    //
-                    //         ElevatedButton(
-                    //             onPressed: (){
-                    //               Navigator.pop(context);
-                    //             },
-                    //             child: Text("No"))
-                    //       ],
-                    //     )
-                    //   ],
-                    // ));
                   },
+
                   child:
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -224,9 +304,158 @@ class SalesPageState extends State<SalesPage> {
     ],);
   }
   //
-  // Widget detailsPage(){
-  //
-  // }
+  Widget detailsPage(){
+    if(selectedItem != null){
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children:[
+          Text("Title: ${selectedItem?.title}"),
+          Text("Item Current Customer ID is ${selectedItem?.custID}"),
+          Text("Item Current Car ID is ${selectedItem?.carID}"),
+          Text("Item Current Dealer ID is ${selectedItem?.dealerID}"),
+          Text("Item Current Date of Sale is ${selectedItem?.date}\n\n"),
+
+          TextField(
+            controller: _displayTitle,
+            decoration: InputDecoration(
+                hintText: "Updated name for record",
+                border: OutlineInputBorder()
+            ),
+          ),
+          TextField(
+            controller: _displayCustID,
+            decoration: InputDecoration(
+                hintText: "Updated Customer ID for record",
+                border: OutlineInputBorder()
+            ),
+          ),
+          TextField(
+            controller: _displayCarID,
+            decoration: InputDecoration(
+                hintText: "Updated Car ID for record",
+                border: OutlineInputBorder()
+            ),
+          ),
+          TextField(
+            controller: _displayDID,
+            decoration: InputDecoration(
+                hintText: "Updated Dealer ID for record",
+                border: OutlineInputBorder()
+            ),
+          ),
+          TextField(
+            controller: _displayDate,
+            decoration: InputDecoration(
+                hintText: "Updated date for record",
+                border: OutlineInputBorder()
+            ),
+          ),
+
+
+
+          //button to delete an record from list
+          ElevatedButton(
+              onPressed: (){
+                setState(() {
+                  daoObj.removeSalesRecord(selectedItem);
+                  records.remove(selectedItem);
+                  selectedItem = null;
+                  _displayTitle.text = "";
+                  _displayCustID.text = "";
+                  _displayCarID.text = "";
+                  _displayDID.text = "";
+                  _displayDate.text = "";
+                });
+
+              },
+              child: Text("Delete Entry")
+          ),
+
+          //button to update a record from list
+          ElevatedButton(
+              onPressed: (){
+                setState(() {
+                  String newTitle = _displayTitle.value.text;
+                  String newCustID = _displayCustID.value.text;
+                  String newCarID = _displayCarID.value.text;
+                  String newDID = _displayDID.value.text;
+                  String newDate = _displayDate.value.text;
+
+                  if (_displayTitle.text != "") {
+                    selectedItem?.title = newTitle;
+                  }
+                  if (_displayCustID.text != "") {
+                    selectedItem?.custID = int.parse(newCustID);
+                  }
+                  if (_displayCarID.text != "") {
+                    selectedItem?.carID = int.parse(newCarID);
+                  }
+                  if (_displayDID.text != "") {
+                    selectedItem?.dealerID = int.parse(newDID);
+                  }
+                  if (_displayDate.text != "") {
+                    selectedItem?.date = newDate;
+                  }
+
+                  daoObj.updateSalesRecord(selectedItem);
+
+                  selectedItem = null;
+                  _displayTitle.text = "";
+                  _displayCustID.text = "";
+                  _displayCarID.text = "";
+                  _displayDID.text = "";
+                  _displayDate.text = "";
+                });
+
+              },
+              child: Text("Update Entry")
+          ),
+          ElevatedButton(
+              onPressed: (){
+                setState(() {
+                  selectedItem = null;
+                });
+
+              },
+              child: Text("Close")
+          ),
+        ],);
+    } else {
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(""),
+          ]
+      );
+    }
+  }
+
+  Widget responsiveLayout(){
+    var size = MediaQuery.of(context).size;
+    var height = size.height;
+    var width = size.width;
+
+    if (width>height && width > 720.00){
+      return Row(children: [
+        Expanded(
+            flex: 3,
+            child: listPage()
+        ),
+
+        Expanded(
+            flex: 2,
+            child: detailsPage())
+        ,
+
+      ],);
+    } else {
+      if(selectedItem==null){
+        return listPage();
+      } else {
+        return detailsPage();
+      }
+    }
+  }
 
 }
 
