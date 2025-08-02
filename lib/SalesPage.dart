@@ -1,25 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:my_flutter_labs/AppLocalizations.dart';
 import 'package:my_flutter_labs/SalesDatabase.dart';
 import 'package:my_flutter_labs/SalesRecords.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
+///Page class to extend StatefulWidget superclass
 class SalesPage extends StatefulWidget {
   @override State<SalesPage> createState() {return SalesPageState();}
 }
 
+///the state for the Sales Page to be returned to SalesPage statefulWidget class create state method
 class SalesPageState extends State<SalesPage> {
+  ///This controller contains the Title of the new record to be added
   late TextEditingController _controller0;
+  ///This controller contains the customer ID of the new record to be added
   late TextEditingController _controller1;
+  ///This controller contains the car ID of the new record to be added
   late TextEditingController _controller2;
+  ///This controller contains the Dealer ID of the new record to be added
   late TextEditingController _controller3;
+  ///This controller contains the date of the new record to be added
   late TextEditingController _controller4;
+  ///List of SalesRecords objects to be used to display the list of records from the database
   List<SalesRecords> records = [];
+  ///variable to hold the data access object for the database
   late var daoObj;
+  ///a variable to hold a reference to the selected object from the list of records from the database
   SalesRecords? selectedItem;
+  ///This controller contains the customer ID of the current record displayed in the details page
   late TextEditingController _displayCustID;
+  ///This controller contains the new title for the current record displayed in the details page to potentially be updated
   late TextEditingController _displayTitle;
+  ///This controller contains the new car ID for the current record displayed in the details page to potentially be updated
   late TextEditingController _displayCarID;
+  ///This controller contains the new dealer ID for the current record displayed in the details page to potentially be updated
   late TextEditingController _displayDID;
+  ///This controller contains the new date for the current record displayed in the details page to potentially be updated
   late TextEditingController _displayDate;
 
 
@@ -117,20 +133,8 @@ class SalesPageState extends State<SalesPage> {
             IconButton(onPressed: () {
               showDialog(context: context,
                   builder: (BuildContext context) => AlertDialog(
-                    title: const Text('Instructions'),
-                    content: const Text(
-                        'To use this page, please enter '
-                        'the ID\'s related to the customers, dealer, and car '
-                        'sold, alongside the date of sale (in format dd-mm-yyyy)'
-                            ' and a name for the '
-                        'sale record.\nAfter creating an entry using the button,'
-                        ' clicking an entry will reveal a page detailing the '
-                        'features of the entry, as well as buttons to update or '
-                        'delete the entry.\n In addition, after adding an entry,'
-                        ' you are given the option to keep the same features to '
-                        'autofill the text boxes to be reused next time you load'
-                        ' the page.'
-                    ),
+                    title: Text("${AppLocalizations.of(context)!.translate('InstTitle')}"),
+                    content: Text("${AppLocalizations.of(context)!.translate('Instructions')}"),
                     actions: <Widget>[
                       ElevatedButton(onPressed: () {
                         Navigator.pop(context);
@@ -149,6 +153,10 @@ class SalesPageState extends State<SalesPage> {
       ),
     );}
 
+  ///Widget to return the list portion of the page, containing input textFields
+  ///for record fields an add button to add record to database and list, and
+  ///the output of the list of returned SalesRecords objects for viewing and selection
+  ///to display in detailsPage widget
   Widget listPage(){
     return Column(children: [
       Row(
@@ -158,7 +166,7 @@ class SalesPageState extends State<SalesPage> {
             Expanded(child: TextField(
               controller: _controller0,
               decoration: InputDecoration(
-                  hintText: "Title",
+                  hintText: "${AppLocalizations.of(context)!.translate('Title')}",
                   border: OutlineInputBorder()
               ),
             )),
@@ -166,7 +174,7 @@ class SalesPageState extends State<SalesPage> {
             Expanded(child: TextField(
               controller: _controller1,
               decoration: InputDecoration(
-                  hintText: "Customer ID",
+                  hintText: "${AppLocalizations.of(context)!.translate('CustID')}",
                   border: OutlineInputBorder()
               ),
             )),
@@ -174,7 +182,7 @@ class SalesPageState extends State<SalesPage> {
             Expanded(child: TextField(
                 controller: _controller2,
                 decoration: InputDecoration(
-                    hintText: "Car ID",
+                    hintText: "${AppLocalizations.of(context)!.translate('CarID')}",
                     border: OutlineInputBorder()
 
                 ))
@@ -182,7 +190,7 @@ class SalesPageState extends State<SalesPage> {
             Expanded(child: TextField(
                 controller: _controller3,
                 decoration: InputDecoration(
-                    hintText: "Dealer ID",
+                    hintText: "${AppLocalizations.of(context)!.translate('DID')}",
                     border: OutlineInputBorder()
 
                 ))
@@ -190,7 +198,7 @@ class SalesPageState extends State<SalesPage> {
             Expanded(child: TextField(
                 controller: _controller4,
                 decoration: InputDecoration(
-                    hintText: "Date (dd-mm-yyyy)",
+                    hintText: "${AppLocalizations.of(context)!.translate('Date')}",
                     border: OutlineInputBorder()
 
                 ))
@@ -203,9 +211,9 @@ class SalesPageState extends State<SalesPage> {
                       _controller2.text.trim().isEmpty ||
                       _controller3.text.trim().isEmpty ||
                       _controller4.text.trim().isEmpty){
+                          ///a snackBar item to reveal a popup to notify of empty fields
                           var popUp = SnackBar(
-                            content: Text("Please enter data for all fields "
-                                "before adding the record"),
+                            content: Text("${AppLocalizations.of(context)!.translate('FailMsg')}"),
                             duration: Duration(seconds: 60),
                             action: SnackBarAction(label: "OK", onPressed: () {
                               ScaffoldMessenger.of(context)
@@ -217,17 +225,25 @@ class SalesPageState extends State<SalesPage> {
                       _controller2.text.trim().isNotEmpty ||
                       _controller3.text.trim().isNotEmpty ||
                       _controller4.text.trim().isEmpty){
+                            ///variable to hold input in Title textfield
                             var inputTitle = _controller0.value.text;
+                            ///variable to hold input in Customer ID textfield
                             var inputCustID = _controller1.value.text;
+                            ///variable to hold input in CarID textfield
                             var inputCarID = _controller2.value.text;
+                            ///variable to hold input in Dealer ID textfield
                             var inputDealerID = _controller3.value.text;
+                            ///variable to hold input in date textfield
                             var inputDate = _controller4.value.text;
+
+                            ///instance of EncryptedSharedPreferences to store
+                            ///previous inputs for autofill upon page reaccess based
+                            ///on user choice
                             final prefs = EncryptedSharedPreferences();
                             showDialog(context: context,
                                 builder: (BuildContext context) => AlertDialog(
 
-                                  content: const Text('Would you like to save '
-                                      'these values for next time?'),
+                                  content: Text("${AppLocalizations.of(context)!.translate('Save')}"),
                                   actions: <Widget>[
 
                                     ElevatedButton(onPressed: () {
@@ -237,15 +253,17 @@ class SalesPageState extends State<SalesPage> {
                                       prefs.setString("SalesPageDID", inputDealerID);
                                       prefs.setString("SalesPageDate", inputDate);
                                       Navigator.pop(context);
-                                    }, child: Text("Yes")),
+                                    }, child: Text("${AppLocalizations.of(context)!.translate('Yes')}")),
 
                                     ElevatedButton(onPressed: () {
                                       prefs.clear();
                                       Navigator.pop(context);
-                                    }, child: Text("No"))
+                                    }, child: Text("${AppLocalizations.of(context)!.translate('No')}"))
                                   ],
                                 ));
                             setState(() {
+                              ///create new object of SalesRecord class to add to
+                              ///database
                               var newRecord = SalesRecords(
                                   SalesRecords.ID++,
                                   inputTitle,
@@ -265,7 +283,7 @@ class SalesPageState extends State<SalesPage> {
                   }
 
                 },
-                child: Text("Add")
+                child: Text("${AppLocalizations.of(context)!.translate('Add')}")
             ),
 
           ]),
@@ -278,7 +296,7 @@ class SalesPageState extends State<SalesPage> {
             if (records.isEmpty) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [Text("There are no items in the list")],
+                children: [Text("${AppLocalizations.of(context)!.translate('NoVals')}")],
               );
 
             } else if (records.isNotEmpty){
@@ -303,50 +321,53 @@ class SalesPageState extends State<SalesPage> {
       )
     ],);
   }
-  //
+
+  ///detail pane of web page, to display attributes for currently selected
+  ///SalesRecords object, as well as prompt the user with options to update
+  ///or delete the viewed record of sale or any of its attributes (excepting ID)
   Widget detailsPage(){
     if(selectedItem != null){
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children:[
-          Text("Title: ${selectedItem?.title}"),
-          Text("Item Current Customer ID is ${selectedItem?.custID}"),
-          Text("Item Current Car ID is ${selectedItem?.carID}"),
-          Text("Item Current Dealer ID is ${selectedItem?.dealerID}"),
-          Text("Item Current Date of Sale is ${selectedItem?.date}\n\n"),
+          Text("${AppLocalizations.of(context)!.translate('CurrTitle')} ${selectedItem?.title}"),
+          Text("${AppLocalizations.of(context)!.translate('CurrCustID')} ${selectedItem?.custID}"),
+          Text("${AppLocalizations.of(context)!.translate('CurrCarID')} ${selectedItem?.carID}"),
+          Text("${AppLocalizations.of(context)!.translate('CurrDID')} ${selectedItem?.dealerID}"),
+          Text("${AppLocalizations.of(context)!.translate('CurrDate')} ${selectedItem?.date}\n\n"),
 
           TextField(
             controller: _displayTitle,
             decoration: InputDecoration(
-                hintText: "Updated name for record",
+                hintText: "${AppLocalizations.of(context)!.translate('UpdTitle')}",
                 border: OutlineInputBorder()
             ),
           ),
           TextField(
             controller: _displayCustID,
             decoration: InputDecoration(
-                hintText: "Updated Customer ID for record",
+                hintText: "${AppLocalizations.of(context)!.translate('UpdCustID')}",
                 border: OutlineInputBorder()
             ),
           ),
           TextField(
             controller: _displayCarID,
             decoration: InputDecoration(
-                hintText: "Updated Car ID for record",
+                hintText: "${AppLocalizations.of(context)!.translate('UpdCarID')}",
                 border: OutlineInputBorder()
             ),
           ),
           TextField(
             controller: _displayDID,
             decoration: InputDecoration(
-                hintText: "Updated Dealer ID for record",
+                hintText: "${AppLocalizations.of(context)!.translate('UpdDID')}",
                 border: OutlineInputBorder()
             ),
           ),
           TextField(
             controller: _displayDate,
             decoration: InputDecoration(
-                hintText: "Updated date for record",
+                hintText: "${AppLocalizations.of(context)!.translate('UpdDate')}",
                 border: OutlineInputBorder()
             ),
           ),
@@ -368,17 +389,22 @@ class SalesPageState extends State<SalesPage> {
                 });
 
               },
-              child: Text("Delete Entry")
+              child: Text("${AppLocalizations.of(context)!.translate('DelBtn')}")
           ),
 
           //button to update a record from list
           ElevatedButton(
               onPressed: (){
                 setState(() {
+                  ///var to hold title from updated title textField
                   String newTitle = _displayTitle.value.text;
+                  ///var to hold potentially updated customer ID from updated customer ID textField
                   String newCustID = _displayCustID.value.text;
+                  ///var to hold potentially updated car ID from updated car ID textField
                   String newCarID = _displayCarID.value.text;
+                  ///var to hold potentially updated Dealer ID from updated Dealer ID textField
                   String newDID = _displayDID.value.text;
+                  ///var to hold potentially updated date from updated date textField
                   String newDate = _displayDate.value.text;
 
                   if (_displayTitle.text != "") {
@@ -408,7 +434,7 @@ class SalesPageState extends State<SalesPage> {
                 });
 
               },
-              child: Text("Update Entry")
+              child: Text("${AppLocalizations.of(context)!.translate('UpdBtn')}")
           ),
           ElevatedButton(
               onPressed: (){
@@ -417,7 +443,7 @@ class SalesPageState extends State<SalesPage> {
                 });
 
               },
-              child: Text("Close")
+              child: Text("${AppLocalizations.of(context)!.translate('Close')}")
           ),
         ],);
     } else {
@@ -430,6 +456,11 @@ class SalesPageState extends State<SalesPage> {
     }
   }
 
+  ///widget to return a responsive layout based on window size, if Landscape
+  ///returns view of the listPage and detailsPage widgets in a single pane,
+  ///else if portrait dimensions, returns a changing layout where it displays
+  ///the listPage until a record is selected, then returns detailsPage until
+  ///record unselected
   Widget responsiveLayout(){
     var size = MediaQuery.of(context).size;
     var height = size.height;
