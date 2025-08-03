@@ -1,5 +1,5 @@
-import 'dart:async';
 import 'package:floor/floor.dart';
+import 'dart:async';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 import 'car.dart';
