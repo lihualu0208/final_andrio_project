@@ -1,0 +1,13 @@
+{
+  "app_title": "Car List",
+  "make": "Make",
+  "model": "Model",
+  "year": "Year",
+  "color": "Color",
+  "add_car": "Add Car",
+  "fill_all_fields": "Please fill all fields",
+  "car_added": "Car added successfully",
+  "car_deleted": "Car deleted",
+  "no_cars": "No cars available",
+  "instructions": "Instructions"
+}
