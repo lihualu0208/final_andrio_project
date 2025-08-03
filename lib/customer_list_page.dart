@@ -291,6 +291,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
             children: [
               TextField(
                 controller: firstNameController,
+                autofocus: true,
                 decoration: InputDecoration(
                   labelText: loc.translate('firstName'),
                   border: const OutlineInputBorder(),
@@ -299,6 +300,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: lastNameController,
+                autofocus: true,
                 decoration: InputDecoration(
                   labelText: loc.translate('lastName'),
                   border: const OutlineInputBorder(),
@@ -307,6 +309,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: addressController,
+                autofocus: true,
                 decoration: InputDecoration(
                   labelText: loc.translate('address'),
                   border: const OutlineInputBorder(),
@@ -315,6 +318,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: birthdayController,
+                autofocus: true,
                 decoration: InputDecoration(
                   labelText: loc.translate('birthday'),
                   border: const OutlineInputBorder(),
@@ -385,83 +389,90 @@ class _CustomerListPageState extends State<CustomerListPage> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc.translate('editCustomer')),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: firstNameController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('firstName'),
-                  border: const OutlineInputBorder(),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(loc.translate('editCustomer')),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: firstNameController,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        labelText: loc.translate('firstName'),
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: lastNameController,
+                      decoration: InputDecoration(
+                        labelText: loc.translate('lastName'),
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: addressController,
+                      decoration: InputDecoration(
+                        labelText: loc.translate('address'),
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: birthdayController,
+                      decoration: InputDecoration(
+                        labelText: loc.translate('birthday'),
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: lastNameController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('lastName'),
-                  border: const OutlineInputBorder(),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(loc.translate('cancel')),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: addressController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('address'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: birthdayController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('birthday'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(loc.translate('cancel')),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final updatedCustomer = Customer(
-                id: customer.id,
-                firstName: firstNameController.text.trim(),
-                lastName: lastNameController.text.trim(),
-                address: addressController.text.trim(),
-                birthday: birthdayController.text.trim(),
-              );
+                ElevatedButton(
+                  onPressed: () async {
+                    final updatedCustomer = Customer(
+                      id: customer.id,
+                      firstName: firstNameController.text.trim(),
+                      lastName: lastNameController.text.trim(),
+                      address: addressController.text.trim(),
+                      birthday: birthdayController.text.trim(),
+                    );
 
-              await widget.customerDao.updateCustomer(updatedCustomer);
-              await _customerRepo.saveCustomerData(
-                firstName: updatedCustomer.firstName,
-                lastName: updatedCustomer.lastName,
-                address: updatedCustomer.address,
-                birthday: updatedCustomer.birthday,
-              );
+                    await widget.customerDao.updateCustomer(updatedCustomer);
+                    await _customerRepo.saveCustomerData(
+                      firstName: updatedCustomer.firstName,
+                      lastName: updatedCustomer.lastName,
+                      address: updatedCustomer.address,
+                      birthday: updatedCustomer.birthday,
+                    );
 
-              if (mounted) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(loc.translate('customerUpdated'))),
-                );
-                _loadCustomers();
-                _checkPreviousCustomer();
-                setState(() => _selectedCustomer = updatedCustomer);
-              }
-            },
-            child: Text(loc.translate('update')),
-          ),
-        ],
-      ),
+                    if (mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(loc.translate('customerUpdated'))),
+                      );
+                      _loadCustomers();
+                      _checkPreviousCustomer();
+                      setState(() => _selectedCustomer = updatedCustomer);
+                    }
+                  },
+                  child: Text(loc.translate('update')),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
   /// Shows application instructions in a dialog.
