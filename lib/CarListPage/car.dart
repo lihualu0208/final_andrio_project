@@ -38,4 +38,12 @@ class Car {
     required this.color,
     required this.imagePath,
   });
+
+  /// The current ID for the next car.
+  static int currentId = 1;
+
+  @override
+  String toString() {
+    return 'Car{id: $id, make: $make, model: $model, year: $year, color: $color, imagePath: $imagePath}';
+  }
 }

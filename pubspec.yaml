@@ -77,7 +77,15 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/lang/
+    - assets/lang/CarListPage/en.json
+    - assets/lang/CarListPage/vi.json
+    - assets/lang/CustomerListPage/en.json
+    - assets/lang/CustomerListPage/zh.json
+    - assets/lang/Dealership/en.json
+    - assets/lang/Dealership/de.json
+    - assets/lang/SalesPage/ca.json
+    - assets/lang/SalesPage/en.json
+
     - assets/images/placeholder.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

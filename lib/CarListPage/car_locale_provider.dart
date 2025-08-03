@@ -32,7 +32,7 @@ class CarLocaleProvider {
   /// Loads the localization file based on the current [locale].
   static Future<CarLocaleProvider> load(Locale locale) async {
     CarLocaleProvider provider = CarLocaleProvider(locale);
-    String jsonString = await rootBundle.loadString('assets/lang/${locale.languageCode}.json');
+    String jsonString = await rootBundle.loadString('assets/lang/CarListPage/${locale.languageCode}.json');
     Map<String, dynamic> jsonMap = json.decode(jsonString);
     provider._localizedStrings = jsonMap.map((key, value) => MapEntry(key, value.toString()));
     return provider;
