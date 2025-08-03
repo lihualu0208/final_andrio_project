@@ -4,10 +4,16 @@
   "model": "Mẫu xe",
   "year": "Năm sản xuất",
   "color": "Màu",
+  "update": "Cập nhật",
+  "delete": "Xóa",
   "add_car": "Thêm xe",
+  "with_images": " với ảnh",
   "fill_all_fields": "Vui lòng điền đầy đủ",
   "car_added": "Đã thêm xe",
   "car_deleted": "Đã xóa xe",
+  "car_updated": "Đã cập nhật xe",
   "no_cars": "Không có xe nào",
-  "instructions": "Hướng dẫn"
+  "instructions": "Hướng dẫn",
+  "select_car": "Vui lòng chọn xe",
+  "tap_car": "Nhấp vào xe để xem chi tiết và cập nhật"
 }

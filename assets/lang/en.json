@@ -4,10 +4,16 @@
   "model": "Model",
   "year": "Year",
   "color": "Color",
+  "update": "Update",
+  "delete": "Delete",
   "add_car": "Add Car",
+  "with_images": " with images",
   "fill_all_fields": "Please fill all fields",
   "car_added": "Car added successfully",
   "car_deleted": "Car deleted",
+  "car_updated": "Car updated",
   "no_cars": "No cars available",
-  "instructions": "Instructions"
+  "instructions": "Instructions",
+  "select_car": "Select a car",
+  "tap_car": "Tap car to see details and update"
 }
