@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'car.dart';
@@ -16,6 +17,7 @@ class CarListPage extends StatefulWidget {
 }
 
 class _CarListPageState extends State<CarListPage> {
+  final _secureStorage = const FlutterSecureStorage();
   late Future<List<Car>> _carList;
   Car? _selectedCar;
 
@@ -32,12 +34,32 @@ class _CarListPageState extends State<CarListPage> {
     });
   }
 
-  void _showAddDialog(CarLocaleProvider loc) {
+  void _showAddDialog(CarLocaleProvider loc, {bool usePrevious = false}) async {
     final makeController = TextEditingController();
     final modelController = TextEditingController();
     final yearController = TextEditingController();
     final colorController = TextEditingController();
     String? imagePath;
+
+    if (usePrevious) {
+      makeController.text = await _secureStorage.read(key: 'last_make') ?? '';
+      modelController.text = await _secureStorage.read(key: 'last_model') ?? '';
+      yearController.text = await _secureStorage.read(key: 'last_year') ?? '';
+      colorController.text = await _secureStorage.read(key: 'last_color') ?? '';
+    }
+
+    makeController.addListener(() {
+      _secureStorage.write(key: 'last_make', value: makeController.text);
+    });
+    modelController.addListener(() {
+      _secureStorage.write(key: 'last_model', value: modelController.text);
+    });
+    yearController.addListener(() {
+      _secureStorage.write(key: 'last_year', value: yearController.text);
+    });
+    colorController.addListener(() {
+      _secureStorage.write(key: 'last_color', value: colorController.text);
+    });
 
     showDialog(
       context: context,
@@ -49,13 +71,8 @@ class _CarListPageState extends State<CarListPage> {
             children: [
               GestureDetector(
                 onTap: () async {
-                  final picker = ImagePicker();
-                  final picked = await picker.pickImage(source: ImageSource.gallery);
-                  if (picked != null) {
-                    setState(() {
-                      imagePath = picked.path;
-                    });
-                  }
+                  final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+                  if (picked != null) setState(() => imagePath = picked.path);
                 },
                 child: imagePath == null
                     ? Image.asset('assets/images/placeholder.png', height: 100)
@@ -69,10 +86,7 @@ class _CarListPageState extends State<CarListPage> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(loc.get('cancel'))),
           ElevatedButton(
             onPressed: () async {
               if ([makeController.text, modelController.text, yearController.text, colorController.text, imagePath].any((e) => e == null || e.isEmpty)) {
@@ -98,15 +112,74 @@ class _CarListPageState extends State<CarListPage> {
     );
   }
 
+
+
+  void _showEditDialog(Car car, CarLocaleProvider loc) {
+    final makeController = TextEditingController(text: car.make);
+    final modelController = TextEditingController(text: car.model);
+    final yearController = TextEditingController(text: car.year);
+    final colorController = TextEditingController(text: car.color);
+    String imagePath = car.imagePath;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(loc.get('edit_car')),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+                  if (picked != null) {
+                    setState(() => imagePath = picked.path);
+                  }
+                },
+                child: imagePath.isEmpty
+                    ? Image.asset('assets/images/placeholder.png', height: 100)
+                    : Image.file(File(imagePath), height: 100),
+              ),
+              TextField(controller: makeController, decoration: InputDecoration(labelText: loc.get('make'))),
+              TextField(controller: modelController, decoration: InputDecoration(labelText: loc.get('model'))),
+              TextField(controller: yearController, decoration: InputDecoration(labelText: loc.get('year'))),
+              TextField(controller: colorController, decoration: InputDecoration(labelText: loc.get('color'))),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(loc.get('cancel'))),
+          ElevatedButton(
+            onPressed: () async {
+              if ([makeController.text, modelController.text, yearController.text, colorController.text, imagePath].any((e) => e.isEmpty)) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.get('fill_all_fields'))));
+                return;
+              }
+              final updatedCar = Car(
+                id: car.id,
+                make: makeController.text,
+                model: modelController.text,
+                year: yearController.text,
+                color: colorController.text,
+                imagePath: imagePath,
+              );
+              await widget.repository.updateCar(updatedCar);
+              Navigator.pop(context);
+              _refreshCars();
+              setState(() => _selectedCar = updatedCar);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.get('car_updated'))));
+            },
+            child: Text(loc.get('update')),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _deleteCar(Car car, CarLocaleProvider loc) async {
     await widget.repository.deleteCar(car);
     _refreshCars();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.get('car_deleted'))));
-  }
-
-  void _updateCar(Car updatedCar) async {
-    await widget.repository.updateCar(updatedCar);
-    _refreshCars();
   }
 
   @override
@@ -128,20 +201,8 @@ class _CarListPageState extends State<CarListPage> {
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ListTile(
-                        title: const Text('English'),
-                        onTap: () {
-                          widget.onLocaleChange(const Locale('en'));
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        title: const Text('Tiếng Việt'),
-                        onTap: () {
-                          widget.onLocaleChange(const Locale('vi'));
-                          Navigator.pop(context);
-                        },
-                      ),
+                      ListTile(title: const Text('English'), onTap: () { widget.onLocaleChange(const Locale('en')); Navigator.pop(context); }),
+                      ListTile(title: const Text('Tiếng Việt'), onTap: () { widget.onLocaleChange(const Locale('vi')); Navigator.pop(context); }),
                     ],
                   ),
                 ),
@@ -154,23 +215,19 @@ class _CarListPageState extends State<CarListPage> {
               context: context,
               builder: (context) => AlertDialog(
                 title: Text(loc.get('instructions')),
-                content: Text('• ${loc.get('add_car')} → with image\n• ${loc.get('fill_all_fields')}\n• Tap car to edit/delete'),
+                content: Text('• ${loc.get('add_car')}${loc.get('with_images')} \n• ${loc.get('fill_all_fields')}\n• ${loc.get('tap_car')}'),
                 actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
               ),
             ),
-          )
+          ),
         ],
       ),
       body: FutureBuilder<List<Car>>(
         future: _carList,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text(loc.get('no_cars')));
-          }
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
+          if (!snapshot.hasData || snapshot.data!.isEmpty) return Center(child: Text(loc.get('no_cars')));
 
           final cars = snapshot.data!;
           return isWide
@@ -191,11 +248,36 @@ class _CarListPageState extends State<CarListPage> {
               ),
               Expanded(
                 child: _selectedCar == null
-                    ? Center(child: Text('Select a car'))
-                    : CarDetailView(
-                  car: _selectedCar!,
-                  onDelete: () => _deleteCar(_selectedCar!, loc),
-                  onUpdate: _updateCar,
+                    ? Center(child: Text(loc.get('select_car')))
+                    : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.file(File(_selectedCar!.imagePath), height: 120),
+                      const SizedBox(height: 12),
+                      Text('${loc.get('make')}: ${_selectedCar!.make}'),
+                      Text('${loc.get('model')}: ${_selectedCar!.model}'),
+                      Text('${loc.get('year')}: ${_selectedCar!.year}'),
+                      Text('${loc.get('color')}: ${_selectedCar!.color}'),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _showEditDialog(_selectedCar!, loc),
+                            child: Text(loc.get('update')),
+                          ),
+                          const SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () => _deleteCar(_selectedCar!, loc),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                            child: Text(loc.get('delete'),
+                            style: const TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -207,77 +289,26 @@ class _CarListPageState extends State<CarListPage> {
               return ListTile(
                 leading: Image.file(File(car.imagePath), height: 40, width: 40, fit: BoxFit.cover),
                 title: Text('${car.make} ${car.model}'),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Scaffold(
-                      appBar: AppBar(title: Text('${car.make} ${car.model}')),
-                      body: CarDetailView(
-                        car: car,
-                        onDelete: () => _deleteCar(car, loc),
-                        onUpdate: _updateCar,
-                      ),
-                    ),
-                  ),
-                ),
+                onTap: () => setState(() => _selectedCar = car),
               );
             },
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddDialog(loc),
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class CarDetailView extends StatelessWidget {
-  final Car car;
-  final VoidCallback onDelete;
-  final Function(Car) onUpdate;
-
-  const CarDetailView({super.key, required this.car, required this.onDelete, required this.onUpdate});
-
-  @override
-  Widget build(BuildContext context) {
-    final makeCtrl = TextEditingController(text: car.make);
-    final modelCtrl = TextEditingController(text: car.model);
-    final yearCtrl = TextEditingController(text: car.year);
-    final colorCtrl = TextEditingController(text: car.color);
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Image.file(File(car.imagePath), height: 120),
-          TextField(controller: makeCtrl),
-          TextField(controller: modelCtrl),
-          TextField(controller: yearCtrl),
-          TextField(controller: colorCtrl),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () => onUpdate(Car(
-                  id: car.id,
-                  make: makeCtrl.text,
-                  model: modelCtrl.text,
-                  year: yearCtrl.text,
-                  color: colorCtrl.text,
-                  imagePath: car.imagePath,
-                )),
-                child: const Text('Update'),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: onDelete,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('Delete'),
-              ),
-            ],
-          )
+          FloatingActionButton(
+            onPressed: () => _showAddDialog(loc),
+            tooltip: loc.get('add_car'),
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: () => _showAddDialog(loc, usePrevious: true),
+            tooltip: loc.get('use_previous'),
+            child: const Icon(Icons.restore),
+          ),
         ],
       ),
     );

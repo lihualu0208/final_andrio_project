@@ -40,6 +40,7 @@ class _CarAppState extends State<CarApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Car List',
       locale: _locale,
       supportedLocales: CarLocaleProvider.supportedLocales,
