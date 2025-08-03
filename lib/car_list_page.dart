@@ -1,3 +1,10 @@
+/*
+ * Student Name: Viet-Quynh Nguyen
+ * Lab Professor: Professor Fedor Ilitchev
+ * Due Date: /04/2025
+ * Description: 25S_CST2335_022 Final Project
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:io';
@@ -6,8 +13,15 @@ import 'car.dart';
 import 'car_repository.dart';
 import 'car_locale_provider.dart';
 
+/// The main page for managing car entries.
+///
+/// Displays a list of cars, allows adding, editing,
+/// deleting, and viewing details. Supports localization and secure data persistence.
 class CarListPage extends StatefulWidget {
+  /// Repository for database operations.
   final CarRepository repository;
+
+  /// Callback to change locale.
   final void Function(Locale) onLocaleChange;
 
   const CarListPage({Key? key, required this.repository, required this.onLocaleChange}) : super(key: key);
@@ -27,6 +41,7 @@ class _CarListPageState extends State<CarListPage> {
     _refreshCars();
   }
 
+  /// Refreshes the list of cars from the database.
   void _refreshCars() {
     setState(() {
       _carList = widget.repository.getAllCars();
@@ -34,6 +49,9 @@ class _CarListPageState extends State<CarListPage> {
     });
   }
 
+  /// Displays a dialog to add a new car.
+  ///
+  /// [usePrevious] determines if stored values should prefill fields.
   void _showAddDialog(CarLocaleProvider loc, {bool usePrevious = false}) async {
     final makeController = TextEditingController();
     final modelController = TextEditingController();
@@ -112,8 +130,7 @@ class _CarListPageState extends State<CarListPage> {
     );
   }
 
-
-
+  /// Displays a dialog to edit an existing car.
   void _showEditDialog(Car car, CarLocaleProvider loc) {
     final makeController = TextEditingController(text: car.make);
     final modelController = TextEditingController(text: car.model);
@@ -176,6 +193,7 @@ class _CarListPageState extends State<CarListPage> {
     );
   }
 
+  /// Deletes a selected car and shows confirmation.
   void _deleteCar(Car car, CarLocaleProvider loc) async {
     await widget.repository.deleteCar(car);
     _refreshCars();
@@ -271,8 +289,7 @@ class _CarListPageState extends State<CarListPage> {
                           ElevatedButton(
                             onPressed: () => _deleteCar(_selectedCar!, loc),
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                            child: Text(loc.get('delete'),
-                            style: const TextStyle(color: Colors.white)),
+                            child: Text(loc.get('delete'), style: const TextStyle(color: Colors.white)),
                           ),
                         ],
                       ),
