@@ -58,7 +58,7 @@ class _CarListPageState extends State<CarListPage> {
                   }
                 },
                 child: imagePath == null
-                    ? Image.asset('assets/placeholder.png', height: 100)
+                    ? Image.asset('assets/images/placeholder.png', height: 100)
                     : Image.file(File(imagePath!), height: 100),
               ),
               TextField(controller: makeController, decoration: InputDecoration(labelText: loc.get('make'))),

@@ -6,12 +6,12 @@ abstract class CarDao {
   @Query('SELECT * FROM cars')
   Future<List<Car>> getAllCars();
 
-  @Insert()
+  @insert
   Future<void> insertCar(Car car);
 
-  @Update()
+  @update
   Future<void> updateCar(Car car);
 
-  @Delete()
+  @delete
   Future<void> deleteCar(Car car);
 }
