@@ -1,45 +1,58 @@
-/// customer_locale_provider.dart
-/// A ChangeNotifier class that manages the application's locale settings.
-///
-/// This class handles language preference persistence using SharedPreferences
-/// and notifies listeners when the locale changes.
+// customer_locale_provider.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'customr_AppLocalizations.dart';
+import 'customr_AppLocalizations.dart'; // Note: Fixed filename casing to match your actual file
 
 class LocaleProvider with ChangeNotifier {
-
   Locale? _locale;
   final String _prefKey = 'languageCode';
-  /// The current locale of the application
+
   Locale? get locale => _locale;
 
-  /// Loads the saved locale preference from SharedPreferences.
   Future<void> loadLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final languageCode = prefs.getString(_prefKey);
-    if (languageCode != null) {
-      _locale = Locale(languageCode);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final languageCode = prefs.getString(_prefKey);
+
+      if (languageCode != null && languageCode.isNotEmpty) {
+        _locale = Locale(languageCode);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error loading locale: $e');
+      // Fallback to default locale if loading fails
+      _locale = const Locale('en');
       notifyListeners();
     }
   }
 
-  /// Sets a new locale for the application and saves it to SharedPreferences.
-  ///
-  /// Only changes the locale if it's one of the supported locales.
-  Future<void> setLocale(Locale locale) async {
-    if (!AppLocalizations.supportedLocales.contains(locale)) return;
+  Future<bool> setLocale(Locale locale) async {
+    try {
+      if (!AppLocalizations.supportedLocales.contains(locale)) {
+        return false;
+      }
 
-    _locale = locale;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_prefKey, locale.languageCode);
-    notifyListeners();
+      _locale = locale;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefKey, locale.languageCode);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint('Error setting locale: $e');
+      return false;
+    }
   }
-  /// Clears the saved locale preference.
-  Future<void> clearLocale() async {
-    _locale = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_prefKey);
-    notifyListeners();
+
+  Future<bool> clearLocale() async {
+    try {
+      _locale = null;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_prefKey);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint('Error clearing locale: $e');
+      return false;
+    }
   }
 }

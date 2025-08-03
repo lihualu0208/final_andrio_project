@@ -98,6 +98,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
         ],
       );
     } else {
+      // return _buildCustomerList();
       return _selectedCustomer == null
           ? _buildCustomerList()
           : _buildCustomerDetails(_selectedCustomer!);
