@@ -18,7 +18,8 @@
   "car_deleted": "Đã xóa xe",
   "car_updated": "Đã cập nhật xe",
   "no_cars": "Không có xe nào",
+  "car_edit": "Cập nhật chi tiết xe",
   "instructions": "Hướng dẫn",
-  "select_car": "Vui lòng chọn xe",
+  "select_car": "Chọn xe để xem chi tiết và cập nhật",
   "tap_car": "Nhấp vào xe để xem chi tiết và cập nhật"
 }

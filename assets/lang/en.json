@@ -18,7 +18,8 @@
   "car_deleted": "Car deleted",
   "car_updated": "Car updated",
   "no_cars": "No cars available",
+  "car_edit": "Update car details",
   "instructions": "Instructions",
-  "select_car": "Select a car",
+  "select_car": "Select a car to see details and update",
   "tap_car": "Tap car to see details and update"
 }
