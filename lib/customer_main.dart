@@ -51,6 +51,7 @@ class MyApp extends StatelessWidget {
     return Consumer<LocaleProvider>(
       builder: (context, localeProvider, child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Customer Management',
           locale: localeProvider.locale,
           localizationsDelegates: const [
