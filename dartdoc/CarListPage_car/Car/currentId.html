@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the load method from the CarLocaleProvider class, for the Dart programming language.">
-  <title>load method - CarLocaleProvider class - car_locale_provider library - Dart API</title>
+  <meta name="description" content="API docs for the currentId property from the Car class, for the Dart programming language.">
+  <title>currentId property - Car class - car library - Dart API</title>
 
 
   
@@ -25,11 +25,11 @@
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">final_andrio_project</a></li>
-    <li><a href="../../CarListPage_car_locale_provider/">CarListPage\car_locale_provider.dart</a></li>
-    <li><a href="../../CarListPage_car_locale_provider/CarLocaleProvider-class.html">CarLocaleProvider</a></li>
-    <li class="self-crumb">load static method</li>
+    <li><a href="../../CarListPage_car/">CarListPage\car.dart</a></li>
+    <li><a href="../../CarListPage_car/Car-class.html">Car</a></li>
+    <li class="self-crumb">currentId property</li>
   </ol>
-  <div class="self-name">load</div>
+  <div class="self-name">currentId</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,43 +46,36 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="CarListPage_car_locale_provider&#47;CarLocaleProvider-class-sidebar.html"
+    data-above-sidebar="CarListPage_car&#47;Car-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">load</span> static method 
+<h1><span class="kind-property">currentId</span> property 
 </h1></div>
 
-    <section class="multi-line-signature">
-      
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../CarListPage_car_locale_provider/CarLocaleProvider-class.html">CarLocaleProvider</a></span>&gt;</span></span>
-<span class="name ">load</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="load-param-locale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span> <span class="parameter-name">locale</span></span></li>
-</ol>)
-
-      
-
-    </section>
     
+      <section class="multi-line-signature">
+        
+        <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>
+        <span class="name ">currentId</span>
+        <div class="features"><span class="feature">getter/setter pair</span></div>
+
+      </section>
+      
 <section class="desc markdown">
-  <p>Loads the localization file based on the current <code>locale</code>.</p>
+  <p>The current ID for the next car.</p>
 </section>
 
-
-    
+      
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;CarLocaleProvider&gt; load(Locale locale) async {
-  CarLocaleProvider provider = CarLocaleProvider(locale);
-  String jsonString = await rootBundle.loadString(&#39;assets&#47;lang&#47;CarListPage&#47;${locale.languageCode}.json&#39;);
-  Map&lt;String, dynamic&gt; jsonMap = json.decode(jsonString);
-  provider._localizedStrings = jsonMap.map((key, value) =&gt; MapEntry(key, value.toString()));
-  return provider;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">static int currentId = 1;</code></pre>
 </section>
 
 
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+    
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -90,15 +83,15 @@
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">final_andrio_project</a></li>
-    <li><a href="../../CarListPage_car_locale_provider/">car_locale_provider</a></li>
-    <li><a href="../../CarListPage_car_locale_provider/CarLocaleProvider-class.html">CarLocaleProvider</a></li>
-    <li class="self-crumb">load static method</li>
+    <li><a href="../../CarListPage_car/">car</a></li>
+    <li><a href="../../CarListPage_car/Car-class.html">Car</a></li>
+    <li class="self-crumb">currentId property</li>
 </ol>
 
-    <h5>CarLocaleProvider class</h5>
-    <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>Car class</h5>
+  <div id="dartdoc-sidebar-left-content"></div>
+</div><!--/.sidebar-offcanvas-->
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
 </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>

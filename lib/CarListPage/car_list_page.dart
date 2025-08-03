@@ -20,11 +20,14 @@ import 'car_locale_provider.dart';
 class CarListPage extends StatefulWidget {
   /// Repository for database operations.
   final CarRepository repository;
-
   /// Callback to change locale.
   final void Function(Locale) onLocaleChange;
 
-  const CarListPage({Key? key, required this.repository, required this.onLocaleChange}) : super(key: key);
+  const CarListPage({
+    Key? key,
+    required this.repository,
+    required this.onLocaleChange,
+  }) : super(key: key);
 
   @override
   State<CarListPage> createState() => _CarListPageState();
@@ -82,10 +85,10 @@ class _CarListPageState extends State<CarListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFFE4E7ED),
         title: Text(loc.get('add_car')),
         content: SingleChildScrollView(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               GestureDetector(
                 onTap: () async {
@@ -96,6 +99,7 @@ class _CarListPageState extends State<CarListPage> {
                     ? Image.asset('assets/images/placeholder.png', height: 100)
                     : Image.file(File(imagePath!), height: 100),
               ),
+
               TextField(controller: makeController, decoration: InputDecoration(labelText: loc.get('make'))),
               TextField(controller: modelController, decoration: InputDecoration(labelText: loc.get('model'))),
               TextField(controller: yearController, decoration: InputDecoration(labelText: loc.get('year'))),
@@ -130,7 +134,7 @@ class _CarListPageState extends State<CarListPage> {
     );
   }
 
-  /// Displays a dialog to edit an existing car.
+  /// Displays a dialog to edit car.
   void _showEditDialog(Car car, CarLocaleProvider loc) {
     final makeController = TextEditingController(text: car.make);
     final modelController = TextEditingController(text: car.model);
@@ -141,17 +145,15 @@ class _CarListPageState extends State<CarListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(loc.get('edit_car')),
+        backgroundColor: const Color(0xFFE4E7ED),
+        title: Text(loc.get('car_edit')),
         content: SingleChildScrollView(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               GestureDetector(
                 onTap: () async {
                   final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-                  if (picked != null) {
-                    setState(() => imagePath = picked.path);
-                  }
+                  if (picked != null) setState(() => imagePath = picked.path);
                 },
                 child: imagePath.isEmpty
                     ? Image.asset('assets/images/placeholder.png', height: 100)
@@ -172,6 +174,7 @@ class _CarListPageState extends State<CarListPage> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.get('fill_all_fields'))));
                 return;
               }
+
               final updatedCar = Car(
                 id: car.id,
                 make: makeController.text,
@@ -180,6 +183,7 @@ class _CarListPageState extends State<CarListPage> {
                 color: colorController.text,
                 imagePath: imagePath,
               );
+
               await widget.repository.updateCar(updatedCar);
               Navigator.pop(context);
               _refreshCars();
@@ -206,74 +210,178 @@ class _CarListPageState extends State<CarListPage> {
     final isWide = MediaQuery.of(context).size.width > 600;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.get('app_title')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Language'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
+      backgroundColor: const Color(0xFFF3F6FA),
+      body: Row(
+        children: [
+          // Left side - Car list
+          Container(
+            width: isWide ? 400 : MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(16),
+            color: const Color(0xFFF3F6FA),
+            child: Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // App title and icons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          loc.get('app_title'),
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.help_outline),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    backgroundColor: const Color(0xFFE4E7ED),
+                                    title: Text(loc.get('instructions')),
+                                    content: Text('${loc.get('add_car')}${loc.get('with_images')}\n${loc.get('fill_all_fields')}\n${loc.get('tap_car')}'),
+                                    actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.language),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    backgroundColor: const Color(0xFFE4E7ED),
+                                    title: const Text("Language"),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                          title: const Text("English"),
+                                          onTap: () {
+                                            widget.onLocaleChange(const Locale('en'));
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        ListTile(
+                                          title: const Text("Tiếng Việt"),
+                                          onTap: () {
+                                            widget.onLocaleChange(const Locale('vi'));
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Car list
+                    Expanded(
+                      child: FutureBuilder<List<Car>>(
+                        future: _carList,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasError) {
+                            return Center(child: Text('Error: ${snapshot.error}'));
+                          }
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Center(child: Text(loc.get('no_cars')));
+                          }
+
+                          final cars = snapshot.data!;
+                          return ListView.builder(
+                            itemCount: cars.length,
+                            itemBuilder: (_, index) {
+                              final car = cars[index];
+                              return GestureDetector(
+                                onTap: () => setState(() => _selectedCar = car),
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('${car.make} ${car.model}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                      const SizedBox(height: 4),
+                                      Text('${car.year} - ${car.color}', style: const TextStyle(color: Colors.grey)),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                // Floating Action Buttons (Add & Use Previous)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ListTile(title: const Text('English'), onTap: () { widget.onLocaleChange(const Locale('en')); Navigator.pop(context); }),
-                      ListTile(title: const Text('Tiếng Việt'), onTap: () { widget.onLocaleChange(const Locale('vi')); Navigator.pop(context); }),
+                      FloatingActionButton(
+                        heroTag: 'add_car',
+                        onPressed: () => _showAddDialog(loc),
+                        backgroundColor: const Color(0xFFD8E7FF),
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        child: const Icon(Icons.add),
+                        tooltip: loc.get('add_car'),
+                      ),
+                      const SizedBox(height: 10),
+                      FloatingActionButton(
+                        heroTag: 'use_previous',
+                        onPressed: () => _showAddDialog(loc, usePrevious: true),
+                        backgroundColor: const Color(0xFFD8E7FF),
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        child: const Icon(Icons.restore),
+                        tooltip: loc.get('use_previous'),
+                      ),
                     ],
                   ),
                 ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text(loc.get('instructions')),
-                content: Text('• ${loc.get('add_car')}${loc.get('with_images')} \n• ${loc.get('fill_all_fields')}\n• ${loc.get('tap_car')}'),
-                actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
-              ),
+              ],
             ),
           ),
-        ],
-      ),
-      body: FutureBuilder<List<Car>>(
-        future: _carList,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-          if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
-          if (!snapshot.hasData || snapshot.data!.isEmpty) return Center(child: Text(loc.get('no_cars')));
-
-          final cars = snapshot.data!;
-          return isWide
-              ? Row(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: cars.length,
-                  itemBuilder: (context, index) {
-                    final car = cars[index];
-                    return ListTile(
-                      leading: Image.file(File(car.imagePath), height: 40, width: 40, fit: BoxFit.cover),
-                      title: Text('${car.make} ${car.model}'),
-                      onTap: () => setState(() => _selectedCar = car),
-                    );
-                  },
-                ),
-              ),
-              Expanded(
+          // Right side - Car details
+          if (isWide)
+            Expanded(
+              child: Container(
+                color: const Color(0xFFE4E7ED),
                 child: _selectedCar == null
-                    ? Center(child: Text(loc.get('select_car')))
+                    ? Center(child: Text(loc.get('select_car'), style: const TextStyle(color: Colors.black54)))
                     : Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Image.file(File(_selectedCar!.imagePath), height: 120),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       Text('${loc.get('make')}: ${_selectedCar!.make}'),
                       Text('${loc.get('model')}: ${_selectedCar!.model}'),
                       Text('${loc.get('year')}: ${_selectedCar!.year}'),
@@ -285,47 +393,19 @@ class _CarListPageState extends State<CarListPage> {
                             onPressed: () => _showEditDialog(_selectedCar!, loc),
                             child: Text(loc.get('update')),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           ElevatedButton(
                             onPressed: () => _deleteCar(_selectedCar!, loc),
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                             child: Text(loc.get('delete'), style: const TextStyle(color: Colors.white)),
                           ),
                         ],
-                      ),
+                      )
                     ],
                   ),
                 ),
               ),
-            ],
-          )
-              : ListView.builder(
-            itemCount: cars.length,
-            itemBuilder: (context, index) {
-              final car = cars[index];
-              return ListTile(
-                leading: Image.file(File(car.imagePath), height: 40, width: 40, fit: BoxFit.cover),
-                title: Text('${car.make} ${car.model}'),
-                onTap: () => setState(() => _selectedCar = car),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () => _showAddDialog(loc),
-            tooltip: loc.get('add_car'),
-            child: const Icon(Icons.add),
-          ),
-          const SizedBox(height: 10),
-          FloatingActionButton(
-            onPressed: () => _showAddDialog(loc, usePrevious: true),
-            tooltip: loc.get('use_previous'),
-            child: const Icon(Icons.restore),
-          ),
+            ),
         ],
       ),
     );
