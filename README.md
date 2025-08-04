@@ -14,7 +14,7 @@ This module allows users to:
 - Automatically repopulate data after app restart using a local database.
 - Save previously entered data using EncryptedSharedPreferences.
 - Reuse previous car details for new entries.
-- Support bilingual UI (English and Vietnamese).
+- Support bilingual UI (English and Vietnamese and more).
 
 ---
 
