@@ -1,25 +1,3 @@
 {
-  "app_title": "Car List",
-  "make": "Make",
-  "model": "Model",
-  "year": "Year",
-  "color": "Color",
-  "update": "Update",
-  "delete": "Delete",
-  "language": "Language",
-  "english": "English",
-  "vietnamese": "Vietnamese",
-  "cancel": "Cancel",
-  "add_car": "Add Car",
-  "use_previous": "Use previous information",
-  "with_images": " with images",
-  "fill_all_fields": "Please fill all fields",
-  "car_added": "Car added successfully",
-  "car_deleted": "Car deleted",
-  "car_updated": "Car updated",
-  "no_cars": "No cars available",
-  "car_edit": "Update car details",
-  "instructions": "Instructions",
-  "select_car": "Select a car to see details and update",
-  "tap_car": "Tap car to see details and update"
+
 }

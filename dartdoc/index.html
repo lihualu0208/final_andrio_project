@@ -43,18 +43,117 @@
   <div id="dartdoc-main-content" class="main-content">
       
 <section class="desc markdown">
-  <h1 id="final_andrio_project">final_andrio_project</h1>
-<p>final Flutter project for group.</p>
-<h2 id="getting-started">Getting Started</h2>
-<p>This project is a starting point for a Flutter application.</p>
-<p>A few resources to get you started if this is your first Flutter project:</p>
+  <h1 id="-car-list-page--cst2335-final-project">🚗 Car List Page – CST2335 Final Project</h1>
+<p>This page is part of a group submission for the CST2335 Graphical Interface Programming Final Project at Algonquin College. It simulates managing a list of cars with full CRUD operations (Create, Read, Update, Delete), persistent storage, localization, and modern UI elements.</p>
+<hr>
+<h2 id="-overview">📋 Overview</h2>
+<p>This module allows users to:</p>
 <ul>
-<li><a href="https://docs.flutter.dev/get-started/codelab">Lab: Write your first Flutter app</a></li>
-<li><a href="https://docs.flutter.dev/cookbook">Cookbook: Useful Flutter samples</a></li>
+<li>Add new cars with details like make, model, year, and image.</li>
+<li>View a list of all added cars using a responsive <code>ListView</code>.</li>
+<li>Select a car to view or update its details.</li>
+<li>Delete existing car records.</li>
+<li>Automatically repopulate data after app restart using a local database.</li>
+<li>Save previously entered data using EncryptedSharedPreferences.</li>
+<li>Reuse previous car details for new entries.</li>
+<li>Support bilingual UI (English and Vietnamese and more).</li>
 </ul>
-<p>For help getting started with Flutter development, view the
-<a href="https://docs.flutter.dev/">online documentation</a>, which offers tutorials,
-samples, guidance on mobile development, and a full API reference.</p>
+<hr>
+<h2 id="-features-implemented">🧱 Features Implemented</h2>
+<h3 id="-main-integration">🔗 Main Integration</h3>
+<ul>
+<li>Integrated into the app's <strong>main navigation page</strong> via one of the four module buttons.</li>
+<li>Launches a car-specific management interface.</li>
+</ul>
+<h3 id="-ui-components">📄 UI Components</h3>
+<ul>
+<li><strong>ListView</strong> of all saved cars.</li>
+<li><strong>TextField + Add Button</strong> for inserting cars.</li>
+<li><strong>Detail Dialog</strong> for editing or deleting cars (reuses creation form layout).</li>
+<li><strong>Image Picker</strong> for selecting a car photo from gallery.</li>
+<li><strong>Default Image Placeholder</strong> if no image selected.</li>
+<li><strong>Snackbar</strong> for user feedback on success/failure actions.</li>
+<li><strong>AlertDialog</strong> for user confirmations and instructions.</li>
+</ul>
+<h3 id="-persistent-storage">🗃️ Persistent Storage</h3>
+<ul>
+<li>Uses <strong>Drift/Moor</strong> to store and retrieve car entries.</li>
+<li>Database repopulates <code>ListView</code> on app launch.</li>
+</ul>
+<h3 id="-preferences--caching">🔐 Preferences &amp; Caching</h3>
+<ul>
+<li>Uses <strong>EncryptedSharedPreferences</strong> to cache the most recent entry for reuse.</li>
+<li>“Use Previous Data” feature replicates the customer page’s functionality.</li>
+</ul>
+<h3 id="-localization">🌍 Localization</h3>
+<ul>
+<li>Fully supports:
+<ul>
+<li><strong>English</strong></li>
+<li><strong>Vietnamese</strong></li>
+<li><strong>And more...</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="-responsive-layout">📱 Responsive Layout</h3>
+<ul>
+<li>Optimized for both <strong>phones</strong> and <strong>tablets</strong>:
+<ul>
+<li>Single-pane on small screens.</li>
+<li>Two-pane layout on larger screens for side-by-side view/edit.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="-tech-stack">🧑‍💻 Tech Stack</h2>
+<ul>
+<li><strong>Language</strong>: Dart</li>
+<li><strong>Framework</strong>: Flutter</li>
+<li><strong>Database</strong>: Drift (Moor)</li>
+<li><strong>UI Elements</strong>: Material, Dialogs, Snackbars</li>
+<li><strong>Preferences</strong>: EncryptedSharedPreferences</li>
+<li><strong>Image Support</strong>: image_picker plugin</li>
+</ul>
+<hr>
+<h2 id="-group-info">👨‍👩‍👧 Group Info</h2>
+<p>This module was developed as part of a 4-person group project.</p>
+<h2 id="-team-members">👥 Team Members</h2>
+<table>
+<thead>
+<tr>
+<th>No.</th>
+<th>Name</th>
+<th>Email Address</th>
+<th>Project Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Lihua Lu</td>
+<td><a href="mailto:lu000199@algonquinlive.com">lu000199@algonquinlive.com</a></td>
+<td>Customer list page</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Hao Tan</td>
+<td><a href="mailto:tan00122@algonquinlive.com">tan00122@algonquinlive.com</a></td>
+<td>Car Dealership list page</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Viet-Quynh Nguyen</td>
+<td><a href="mailto:nguy1079@algonquinlive.com">nguy1079@algonquinlive.com</a></td>
+<td>Car list page</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Alexander Ala-Kantti</td>
+<td><a href="mailto:alak0035@algonquinlive.com">alak0035@algonquinlive.com</a></td>
+<td>Sales list page</td>
+</tr>
+</tbody>
+</table>
 </section>
 
 
@@ -233,6 +332,13 @@ Loads translations from JSON files based on the current locale.
 Manages the last saved dealership information.
 </dd>
 
+          <dt id="main">
+  <span class="name"><a href="main/">main</a></span> 
+
+</dt>
+<dd>
+</dd>
+
           <dt id="AppLocalizations">
   <span class="name"><a href="SalesPage_AppLocalizations/">SalesPage\AppLocalizations</a></span> 
 
@@ -315,6 +421,7 @@ Manages the last saved dealership information.
       <li><a href="DealershipPage_dealership_localizations/">DealershipPage\dealership_localizations</a></li>
       <li><a href="DealershipPage_dealership_main/">DealershipPage\dealership_main</a></li>
       <li><a href="DealershipPage_dealership_repository/">DealershipPage\dealership_repository</a></li>
+      <li><a href="main/">main</a></li>
       <li><a href="SalesPage_AppLocalizations/">SalesPage\AppLocalizations</a></li>
       <li><a href="SalesPage_Sales_main/">SalesPage\Sales_main</a></li>
       <li><a href="SalesPage_SalesDatabase/">SalesPage\SalesDatabase</a></li>
