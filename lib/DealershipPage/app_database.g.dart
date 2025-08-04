@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'app_database.dart';
+part of 'dealership_database.dart';
 
 // **************************************************************************
 // FloorGenerator

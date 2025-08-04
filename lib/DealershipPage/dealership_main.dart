@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'app_database.dart';
+import 'dealership_database.dart';
 import 'dealership_dao.dart';
 import 'dealership_list_page.dart';
-import 'app_localizations.dart';
+import 'dealership_localizations.dart';
+import 'dealership_detail_page.dart';
+import 'car_dealership.dart';
 
-/**
- * Main entry point for the Car Dealership Management application.
- * Initializes the database and runs the app.
- */
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -21,16 +19,11 @@ void main() async {
   runApp(MyApp(dealershipDao: dealershipDao));
 }
 
-/**
- * The root widget of the application.
- * Manages language localization and provides the main app structure.
- */
 class MyApp extends StatefulWidget {
   final DealershipDao dealershipDao;
 
   const MyApp({super.key, required this.dealershipDao});
 
-  /// Changes the app's locale/language
   static void setLocale(BuildContext context, Locale newLocale) {
     _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
     state?.changeLanguage(newLocale);
@@ -43,7 +36,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en');
 
-  /// Updates the current locale and triggers a rebuild
   void changeLanguage(Locale locale) {
     setState(() {
       _locale = locale;
@@ -75,14 +67,49 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-/**
- * A page that displays dealerships in a master-detail layout on large screens
- * or a list-only layout on small screens.
- */
-class DealershipMasterDetailPage extends StatelessWidget {
+class DealershipMasterDetailPage extends StatefulWidget {
   final DealershipDao dealershipDao;
 
   const DealershipMasterDetailPage({super.key, required this.dealershipDao});
+
+  @override
+  State<DealershipMasterDetailPage> createState() => _DealershipMasterDetailPageState();
+}
+
+class _DealershipMasterDetailPageState extends State<DealershipMasterDetailPage> {
+  Dealership? _selectedDealership;
+  final GlobalKey<DealershipListPageState> _dealershipListPageKey = GlobalKey();
+
+  void _handleDealershipSelected(Dealership dealership) {
+    setState(() {
+      _selectedDealership = dealership;
+    });
+  }
+
+  void _handleUpdate(Dealership updatedDealership) async {
+    await widget.dealershipDao.updateDealership(updatedDealership);
+    await _dealershipListPageKey.currentState?.loadDealerships();
+    setState(() {
+      _selectedDealership = updatedDealership;
+    });
+  }
+
+
+  void _handleDelete(Dealership dealership) async {
+    await widget.dealershipDao.deleteDealership(dealership);
+    await _dealershipListPageKey.currentState?.loadDealerships();
+
+
+    final dealerships = await widget.dealershipDao.findAllDealerships();
+
+    setState(() {
+      if (dealerships.isEmpty) {
+        _selectedDealership = null;
+      } else if (_selectedDealership?.id == dealership.id) {
+        _selectedDealership = null;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,14 +117,16 @@ class DealershipMasterDetailPage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth > 600) {
-            // Tablet/Desktop layout - side by side
             return Row(
               children: [
                 Flexible(
                   flex: 1,
                   child: DealershipListPage(
-                    dealershipDao: dealershipDao,
+                    key: _dealershipListPageKey,
+                    dealershipDao: widget.dealershipDao,
                     isMaster: true,
+                    onDealershipSelected: _handleDealershipSelected,
+                    selectedDealership: _selectedDealership,
                   ),
                 ),
                 const VerticalDivider(width: 1),
@@ -105,7 +134,13 @@ class DealershipMasterDetailPage extends StatelessWidget {
                   flex: 2,
                   child: Container(
                     color: Theme.of(context).colorScheme.surfaceVariant,
-                    child: Center(
+                    child: _selectedDealership != null
+                        ? DealershipDetailPage(
+                      dealership: _selectedDealership!,
+                      onUpdate: _handleUpdate,
+                      onDelete: _handleDelete,
+                    )
+                        : Center(
                       child: Text(
                         AppLocalizations.of(context)!.translate('select_to_view_details'),
                       ),
@@ -115,9 +150,8 @@ class DealershipMasterDetailPage extends StatelessWidget {
               ],
             );
           } else {
-            // Phone layout - full screen
             return DealershipListPage(
-              dealershipDao: dealershipDao,
+              dealershipDao: widget.dealershipDao,
               isMaster: false,
             );
           }
