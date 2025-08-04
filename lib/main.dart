@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'SalesPage/AppLocalizations.dart';
 import 'SalesPage/SalesPage.dart';
-//TODO reminder to other members to import your pages and add navigator push to page
-//TODO reminder to other members to add personal localizations
+//TODO reminder to other members to import your pages and add navigator push to page. remove after completion
+//TODO reminder to other members to add personal localizations. remove after completion
 
 void main() {
   runApp(const MyApp());
