@@ -8,7 +8,7 @@
   "CarID" : "Car ID",
   "DID" : "Dealer ID",
   "Date" : "Date (dd-mm-yyyy)",
-  "Instructions" : "To use this page, please enter the ID\\'s related to the customers, dealer, and car sold, alongside the date of sale (in format dd-mm-yyyy) and a name for the sale record.\\nAfter creating an entry using the button, clicking an entry will reveal a page detailing the features of the entry, as well as buttons to update or delete the entry.\\n In addition, after adding an entry, you are given the option to keep the same features to autofill the text boxes to be reused next time you load the page.",
+  "Instructions" : "To use this page, please enter the ID's related to the customers, dealer, and car sold, alongside the date of sale (in format dd-mm-yyyy) and a name for the sale record. After creating an entry using the button, clicking an entry will reveal a page detailing the features of the entry, as well as buttons to update or delete the entry. In addition, after adding an entry, you are given the option to keep the same features to autofill the text boxes to be reused next time you load the page.",
   "FailMsg" : "Please enter data for all fields before adding the record",
   "Instr_OK" : "Got it!",
   "OK" : "Okay",
