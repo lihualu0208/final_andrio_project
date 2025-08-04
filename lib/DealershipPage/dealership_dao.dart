@@ -2,7 +2,6 @@
  * Data Access Object for dealership operations.
  * Defines all database operations related to dealerships.
  */
-// dealership_dao.dart
 import 'package:floor/floor.dart';
 import 'car_dealership.dart';
 
@@ -13,7 +12,9 @@ abstract class DealershipDao {
   @Query('SELECT * FROM dealerships ORDER BY id ASC')
   Future<List<Dealership>> findAllDealerships();
 
-  /// Finds the maximum ID in the dealerships table
+  /// Finds the maximum ID in the dealerships table.
+  ///
+
   @Query('SELECT MAX(id) FROM dealerships')
   Future<int?> findMaxId();
 

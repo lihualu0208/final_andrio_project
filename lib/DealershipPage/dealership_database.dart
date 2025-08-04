@@ -2,7 +2,7 @@
  * The floor database definition for the dealership management app.
  * Defines the database version and entities.
  */
-// app_database.dart
+// dealership_database.dart
 import 'dart:async';
 import 'package:floor/floor.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;

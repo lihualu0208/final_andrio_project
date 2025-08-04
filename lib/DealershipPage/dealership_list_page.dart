@@ -1,34 +1,33 @@
-/**
- * The main page that displays and manages the list of dealerships.
- * Handles CRUD operations and provides UI for dealership management.
- */
 import 'package:flutter/material.dart';
 import 'car_dealership.dart';
 import 'dealership_dao.dart';
 import 'dealership_repository.dart';
-import 'app_localizations.dart';
+import 'dealership_localizations.dart';
 import 'dealership_main.dart';
+import 'dealership_detail_page.dart';
 
-/// Displays a list of dealerships and handles their management
 class DealershipListPage extends StatefulWidget {
   final DealershipDao dealershipDao;
   final bool isMaster;
+  final Function(Dealership)? onDealershipSelected;
+  final Dealership? selectedDealership;
 
   const DealershipListPage({
     super.key,
     required this.dealershipDao,
     this.isMaster = false,
+    this.onDealershipSelected,
+    this.selectedDealership,
   });
 
   @override
-  State<DealershipListPage> createState() => _DealershipListPageState();
+  State<DealershipListPage> createState() => DealershipListPageState();
 }
 
-class _DealershipListPageState extends State<DealershipListPage> {
+class DealershipListPageState extends State<DealershipListPage> {
   final DealershipRepository _dealershipRepo = DealershipRepository();
   final List<Dealership> _dealerships = [];
   bool _hasLastDealership = false;
-  Dealership? _selectedDealership;
 
   late TextEditingController _nameController;
   late TextEditingController _addressController;
@@ -42,7 +41,7 @@ class _DealershipListPageState extends State<DealershipListPage> {
     _addressController = TextEditingController();
     _cityController = TextEditingController();
     _postalCodeController = TextEditingController();
-    _loadDealerships();
+    loadDealerships();
     _checkLastDealership();
   }
 
@@ -55,8 +54,7 @@ class _DealershipListPageState extends State<DealershipListPage> {
     super.dispose();
   }
 
-  /// Loads all dealerships from the database
-  Future<void> _loadDealerships() async {
+  Future<void> loadDealerships() async {
     final dealerships = await widget.dealershipDao.findAllDealerships();
     setState(() {
       _dealerships.clear();
@@ -64,23 +62,18 @@ class _DealershipListPageState extends State<DealershipListPage> {
     });
 
     final maxId = await widget.dealershipDao.findMaxId();
-    if (maxId != null) {
-      Dealership.currentId = maxId + 1;
-    } else {
-      Dealership.currentId = 1;
-    }
+    // ✅ 避免 maxId 为 null 导致的类型转换错误
+    Dealership.currentId = (maxId ?? 0) + 1;
   }
 
-  /// Checks if there's a previously saved dealership
   Future<void> _checkLastDealership() async {
     await _dealershipRepo.loadData();
     setState(() {
-      _hasLastDealership = _dealershipRepo.name.isNotEmpty &&
-          _dealershipRepo.address.isNotEmpty;
+      _hasLastDealership =
+          _dealershipRepo.name.isNotEmpty && _dealershipRepo.address.isNotEmpty;
     });
   }
 
-  /// Shows a dialog for adding a new dealership
   void _showAddDealershipDialog({bool useLastDealership = false}) {
     _nameController.clear();
     _addressController.clear();
@@ -97,7 +90,8 @@ class _DealershipListPageState extends State<DealershipListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.translate('add_new_dealership')),
+        title: Text(AppLocalizations.of(context)!
+            .translate('add_new_dealership')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -105,14 +99,16 @@ class _DealershipListPageState extends State<DealershipListPage> {
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('dealership_name'),
+                  labelText: AppLocalizations.of(context)!
+                      .translate('dealership_name'),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _addressController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('address'),
+                  labelText:
+                  AppLocalizations.of(context)!.translate('address'),
                 ),
               ),
               const SizedBox(height: 16),
@@ -126,7 +122,8 @@ class _DealershipListPageState extends State<DealershipListPage> {
               TextField(
                 controller: _postalCodeController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('postal_code'),
+                  labelText: AppLocalizations.of(context)!
+                      .translate('postal_code'),
                 ),
               ),
             ],
@@ -144,12 +141,14 @@ class _DealershipListPageState extends State<DealershipListPage> {
               final city = _cityController.text.trim();
               final postalCode = _postalCodeController.text.trim();
 
-              if (name.isEmpty || address.isEmpty || city.isEmpty || postalCode.isEmpty) {
+              if (name.isEmpty ||
+                  address.isEmpty ||
+                  city.isEmpty ||
+                  postalCode.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.translate('required_fields'),
-                    ),
+                    content: Text(AppLocalizations.of(context)!
+                        .translate('required_fields')),
                   ),
                 );
                 return;
@@ -175,15 +174,13 @@ class _DealershipListPageState extends State<DealershipListPage> {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.translate(
-                        'added_success',
-                        params: {'name': name},
-                      ),
-                    ),
+                    content: Text(AppLocalizations.of(context)!.translate(
+                      'added_success',
+                      params: {'name': name},
+                    )),
                   ),
                 );
-                _loadDealerships();
+                loadDealerships();
                 _checkLastDealership();
               }
             },
@@ -194,46 +191,49 @@ class _DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
-  /// Shows a read-only dialog with dealership details (for phone layout)
   void _showDealershipDialog(Dealership dealership) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.translate('dealership_details')),
+        title: Text(AppLocalizations.of(context)!
+            .translate('dealership_details')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: TextEditingController(text: dealership.name),
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('dealership_name'),
-                ),
                 readOnly: true,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!
+                      .translate('dealership_name'),
+                ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: TextEditingController(text: dealership.address),
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('address'),
-                ),
                 readOnly: true,
+                decoration: InputDecoration(
+                  labelText:
+                  AppLocalizations.of(context)!.translate('address'),
+                ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: TextEditingController(text: dealership.city),
+                readOnly: true,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.translate('city'),
                 ),
-                readOnly: true,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: TextEditingController(text: dealership.postalCode),
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('postal_code'),
-                ),
                 readOnly: true,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!
+                      .translate('postal_code'),
+                ),
               ),
             ],
           ),
@@ -248,77 +248,22 @@ class _DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
-  /// Handles showing dealership details based on screen size
   void _showDealershipDetails(Dealership dealership, BuildContext context) {
     if (widget.isMaster) {
-      setState(() {
-        _selectedDealership = dealership;
-      });
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => DealershipDetailPage(
-            dealership: dealership,
-            onUpdate: _handleUpdate,
-            onDelete: _handleDelete,
-          ),
-        ),
-      );
+      widget.onDealershipSelected?.call(dealership);
     } else {
       _showDealershipDialog(dealership);
     }
   }
 
-  /// Handles updating a dealership
-  void _handleUpdate(Dealership updatedDealership) async {
-    await widget.dealershipDao.updateDealership(updatedDealership);
-    await _dealershipRepo.saveDealershipData(
-      name: updatedDealership.name,
-      address: updatedDealership.address,
-      city: updatedDealership.city,
-      postalCode: updatedDealership.postalCode,
-    );
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.translate('updated_success'),
-          ),
-        ),
-      );
-      _loadDealerships();
-      _checkLastDealership();
-    }
-  }
-
-  /// Handles deleting a dealership
-  void _handleDelete(Dealership dealership) async {
-    await widget.dealershipDao.deleteDealership(dealership);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.translate(
-              'deleted_success',
-              params: {'name': dealership.name},
-            ),
-          ),
-        ),
-      );
-      _loadDealerships();
-      _checkLastDealership();
-    }
-  }
-
-  /// Shows application instructions
   void _showInstructions() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.translate('instructions')),
-        content: Text(
-          AppLocalizations.of(context)!.translate('instructions_content'),
-        ),
+        title:
+        Text(AppLocalizations.of(context)!.translate('instructions')),
+        content: Text(AppLocalizations.of(context)!
+            .translate('instructions_content')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -329,12 +274,12 @@ class _DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
-  /// Shows language selection dialog
   void _showLanguageDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.translate('select_language')),
+        title: Text(
+            AppLocalizations.of(context)!.translate('select_language')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -362,43 +307,49 @@ class _DealershipListPageState extends State<DealershipListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.translate('dealership_management')),
+        title: Text(AppLocalizations.of(context)!
+            .translate('dealership_management')),
         actions: [
           IconButton(
             icon: const Icon(Icons.help),
             onPressed: _showInstructions,
-            tooltip: AppLocalizations.of(context)!.translate('instructions'),
+            tooltip:
+            AppLocalizations.of(context)!.translate('instructions'),
           ),
           IconButton(
             icon: const Icon(Icons.language),
             onPressed: () => _showLanguageDialog(context),
-            tooltip: AppLocalizations.of(context)!.translate('change_language'),
+            tooltip: AppLocalizations.of(context)!
+                .translate('change_language'),
           ),
         ],
       ),
       body: _dealerships.isEmpty
           ? Center(
-        child: Text(
-          AppLocalizations.of(context)!.translate('no_dealerships'),
-        ),
+        child: Text(AppLocalizations.of(context)!
+            .translate('no_dealerships')),
       )
           : ListView.builder(
         itemCount: _dealerships.length,
         itemBuilder: (context, index) {
           final dealership = _dealerships[index];
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
               title: Text(dealership.name),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(dealership.address),
-                  Text('${dealership.city}, ${dealership.postalCode}'),
+                  Text(
+                      '${dealership.city}, ${dealership.postalCode}'),
                 ],
               ),
-              onTap: () => _showDealershipDetails(dealership, context),
-              selected: widget.isMaster && _selectedDealership == dealership,
+              onTap: () =>
+                  _showDealershipDetails(dealership, context),
+              selected: widget.isMaster &&
+                  widget.selectedDealership?.id == dealership.id,
             ),
           );
         },
@@ -410,145 +361,20 @@ class _DealershipListPageState extends State<DealershipListPage> {
             heroTag: 'add_dealership',
             onPressed: () => _showAddDealershipDialog(),
             child: const Icon(Icons.add),
-            tooltip: AppLocalizations.of(context)!.translate('add_dealership'),
+            tooltip: AppLocalizations.of(context)!
+                .translate('add_dealership'),
           ),
           if (_hasLastDealership) ...[
             const SizedBox(height: 10),
             FloatingActionButton(
               heroTag: 'copy_last',
-              onPressed: () => _showAddDealershipDialog(useLastDealership: true),
+              onPressed: () => _showAddDealershipDialog(
+                  useLastDealership: true),
               child: const Icon(Icons.content_copy),
-              tooltip: AppLocalizations.of(context)!.translate('use_last_data'),
+              tooltip: AppLocalizations.of(context)!
+                  .translate('use_last_data'),
             ),
           ],
-        ],
-      ),
-    );
-  }
-}
-
-/**
- * Displays detailed information about a single dealership.
- * Provides options to edit or delete the dealership.
- */
-class DealershipDetailPage extends StatelessWidget {
-  final Dealership dealership;
-  final Function(Dealership) onUpdate;
-  final Function(Dealership) onDelete;
-
-  const DealershipDetailPage({
-    super.key,
-    required this.dealership,
-    required this.onUpdate,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.translate('dealership_details')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () => onDelete(dealership),
-            tooltip: AppLocalizations.of(context)!.translate('delete'),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              dealership.name,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              dealership.address,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            Text(
-              '${dealership.city}, ${dealership.postalCode}',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () => _showEditDialog(context),
-              child: Text(AppLocalizations.of(context)!.translate('edit')),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Shows a dialog for editing dealership details
-  void _showEditDialog(BuildContext context) {
-    final nameController = TextEditingController(text: dealership.name);
-    final addressController = TextEditingController(text: dealership.address);
-    final cityController = TextEditingController(text: dealership.city);
-    final postalCodeController = TextEditingController(text: dealership.postalCode);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.translate('edit_dealership')),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('dealership_name'),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: addressController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('address'),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: cityController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('city'),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: postalCodeController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.translate('postal_code'),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.translate('cancel')),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final updatedDealership = Dealership(
-                id: dealership.id,
-                name: nameController.text.trim(),
-                address: addressController.text.trim(),
-                city: cityController.text.trim(),
-                postalCode: postalCodeController.text.trim(),
-              );
-              onUpdate(updatedDealership);
-              Navigator.pop(context);
-            },
-            child: Text(AppLocalizations.of(context)!.translate('update')),
-          ),
         ],
       ),
     );
