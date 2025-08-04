@@ -83,8 +83,8 @@ flutter:
     - assets/lang/CustomerListPage/zh.json
     - assets/lang/Dealership/en.json
     - assets/lang/Dealership/de.json
-    - assets/lang/SalesPage/ca.json
     - assets/lang/SalesPage/en.json
+    - assets/lang/SalesPage/fr.json
 
     - assets/images/placeholder.png
 

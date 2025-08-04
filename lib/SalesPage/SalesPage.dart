@@ -129,7 +129,10 @@ class SalesPageState extends State<SalesPage> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text("Sales Page"),
           actions: [
-
+            //Tried mutliple ways of changing locale from subpage but none were successful, code commented out for now
+            //each button should set locale to english or french
+            OutlinedButton(onPressed: (){/*setLocale(Locale("en", ""));*/}, child: Text("EN")),
+            OutlinedButton(onPressed: (){/*setLocale(Locale("fr", ""));*/}, child: Text("FR")),
             IconButton(onPressed: () {
               showDialog(context: context,
                   builder: (BuildContext context) => AlertDialog(

@@ -18,7 +18,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp>{
-  var _locale = Locale("en", "ca");
+  var _locale = Locale("en", "CA");
 
   void changeLanguage(Locale newLocale){
     setState(() {
@@ -30,7 +30,8 @@ class _MyAppState extends State<MyApp>{
   Widget build(BuildContext context) {
     return MaterialApp(
       supportedLocales: [
-        Locale("en", "CA")
+        Locale("en", "CA"),
+        Locale("fr", "FR"),
       ],
 
       localizationsDelegates: const[
