@@ -57,7 +57,6 @@ This module allows users to:
 
 - **Language**: Dart
 - **Framework**: Flutter
-- **Database**: Drift (Moor)
 - **UI Elements**: Material, Dialogs, Snackbars
 - **Preferences**: EncryptedSharedPreferences
 - **Image Support**: image_picker plugin
