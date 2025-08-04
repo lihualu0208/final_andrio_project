@@ -1,12 +1,22 @@
+/**
+ * Displays detailed information about a dealership and allows editing.
+ */
 import 'package:flutter/material.dart';
 import 'car_dealership.dart';
 import 'dealership_localizations.dart';
 
+/// A widget that shows detailed information about a dealership and allows editing
 class DealershipDetailPage extends StatefulWidget {
+  /// The dealership to display and edit
   final Dealership dealership;
+
+  /// Callback when the dealership is updated
   final Function(Dealership) onUpdate;
+
+  /// Callback when the dealership is deleted
   final Function(Dealership) onDelete;
 
+  /// Creates a detail page for the given dealership
   const DealershipDetailPage({
     Key? key,
     required this.dealership,
@@ -18,6 +28,7 @@ class DealershipDetailPage extends StatefulWidget {
   State<DealershipDetailPage> createState() => _DealershipDetailPageState();
 }
 
+/// State for the dealership detail page, manages form editing
 class _DealershipDetailPageState extends State<DealershipDetailPage> {
   late TextEditingController _nameController;
   late TextEditingController _addressController;

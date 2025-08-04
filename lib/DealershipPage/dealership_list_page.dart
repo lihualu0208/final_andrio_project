@@ -1,3 +1,6 @@
+/**
+ * Displays a list of dealerships and provides functionality to add, view, and manage them.
+ */
 import 'package:flutter/material.dart';
 import 'car_dealership.dart';
 import 'dealership_dao.dart';
@@ -6,12 +9,21 @@ import 'dealership_localizations.dart';
 import 'dealership_main.dart';
 import 'dealership_detail_page.dart';
 
+/// A page that displays a list of dealerships and allows management operations
 class DealershipListPage extends StatefulWidget {
+  /// Data access object for dealership operations
   final DealershipDao dealershipDao;
+
+  /// Whether this page is in master-detail mode
   final bool isMaster;
+
+  /// Callback when a dealership is selected (used in master-detail mode)
   final Function(Dealership)? onDealershipSelected;
+
+  /// The currently selected dealership (used in master-detail mode)
   final Dealership? selectedDealership;
 
+  /// Creates a dealership list page with the required DAO
   const DealershipListPage({
     super.key,
     required this.dealershipDao,
@@ -24,14 +36,27 @@ class DealershipListPage extends StatefulWidget {
   State<DealershipListPage> createState() => DealershipListPageState();
 }
 
+/// State for the dealership list page, manages dealership data and UI
 class DealershipListPageState extends State<DealershipListPage> {
+  /// Repository for managing last used dealership data
   final DealershipRepository _dealershipRepo = DealershipRepository();
+
+  /// List of dealerships to display
   final List<Dealership> _dealerships = [];
+
+  /// Whether there is last used dealership data available
   bool _hasLastDealership = false;
 
+  /// Controller for dealership name input
   late TextEditingController _nameController;
+
+  /// Controller for dealership address input
   late TextEditingController _addressController;
+
+  /// Controller for dealership city input
   late TextEditingController _cityController;
+
+  /// Controller for dealership postal code input
   late TextEditingController _postalCodeController;
 
   @override
@@ -54,6 +79,7 @@ class DealershipListPageState extends State<DealershipListPage> {
     super.dispose();
   }
 
+  /// Loads all dealerships from the database and updates the list
   Future<void> loadDealerships() async {
     final dealerships = await widget.dealershipDao.findAllDealerships();
     setState(() {
@@ -62,10 +88,10 @@ class DealershipListPageState extends State<DealershipListPage> {
     });
 
     final maxId = await widget.dealershipDao.findMaxId();
-    // ✅ 避免 maxId 为 null 导致的类型转换错误
     Dealership.currentId = (maxId ?? 0) + 1;
   }
 
+  /// Checks if there is last used dealership data available
   Future<void> _checkLastDealership() async {
     await _dealershipRepo.loadData();
     setState(() {
@@ -74,6 +100,7 @@ class DealershipListPageState extends State<DealershipListPage> {
     });
   }
 
+  /// Shows a dialog for adding a new dealership
   void _showAddDealershipDialog({bool useLastDealership = false}) {
     _nameController.clear();
     _addressController.clear();
@@ -191,6 +218,7 @@ class DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
+  /// Shows a dialog with dealership details
   void _showDealershipDialog(Dealership dealership) {
     showDialog(
       context: context,
@@ -248,6 +276,7 @@ class DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
+  /// Handles showing dealership details based on the display mode
   void _showDealershipDetails(Dealership dealership, BuildContext context) {
     if (widget.isMaster) {
       widget.onDealershipSelected?.call(dealership);
@@ -256,6 +285,7 @@ class DealershipListPageState extends State<DealershipListPage> {
     }
   }
 
+  /// Shows application instructions
   void _showInstructions() {
     showDialog(
       context: context,
@@ -274,6 +304,7 @@ class DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
+  /// Shows a language selection dialog
   void _showLanguageDialog(BuildContext context) {
     showDialog(
       context: context,

@@ -6,11 +6,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Handles loading and accessing localized strings
+/// Handles loading and accessing localized strings for the dealership management app.
 class AppLocalizations {
+  /// The current locale for translations
   final Locale locale;
+
+  /// Map storing all localized strings for the current locale
   late Map<String, String> _localizedStrings;
 
+  /// Creates an instance of AppLocalizations for the given locale
   AppLocalizations(this.locale);
 
   /// Retrieves the AppLocalizations instance for the current context
@@ -23,6 +27,8 @@ class AppLocalizations {
   _AppLocalizationsDelegate();
 
   /// Loads translations from JSON file for the current locale
+  ///
+  /// Returns `true` if loading was successful, `false` otherwise
   Future<bool> load() async {
     try {
       final jsonString = await rootBundle
@@ -40,7 +46,12 @@ class AppLocalizations {
 
   /**
    * Translates a key to the current locale's string.
+   *
    * Optionally replaces placeholders with provided parameters.
+   *
+   * @param key The translation key to look up
+   * @param params Optional map of parameters to replace in the translated string
+   * @return The translated string with parameters replaced, or the key if no translation found
    */
   String translate(String key, {Map<String, String> params = const {}}) {
     var translation = _localizedStrings[key] ?? key;
@@ -50,7 +61,7 @@ class AppLocalizations {
     return translation;
   }
 
-  /// Checks if a translation key exists
+  /// Checks if a translation key exists in the current locale
   bool containsKey(String key) => _localizedStrings.containsKey(key);
 }
 

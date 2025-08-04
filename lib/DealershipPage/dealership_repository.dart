@@ -2,10 +2,9 @@
  * Handles persistent storage of dealership data using encrypted shared preferences.
  * Manages the last saved dealership information.
  */
-// dealership_repository.dart
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
-/// Manages dealership data persistence
+/// Manages dealership data persistence using encrypted shared preferences
 class DealershipRepository {
   // Keys for shared preferences
   static const _nameKey = 'dealership_name';
@@ -31,6 +30,7 @@ class DealershipRepository {
   /// Getter for dealership postal code
   String get postalCode => _postalCode;
 
+  /// Instance of encrypted shared preferences
   final EncryptedSharedPreferences _prefs = EncryptedSharedPreferences();
 
   /// Loads saved dealership data from shared preferences
@@ -54,6 +54,11 @@ class DealershipRepository {
   /**
    * Saves complete dealership data to shared preferences.
    * Updates all fields and persists them.
+   *
+   * @param name The dealership name to save
+   * @param address The dealership address to save
+   * @param city The dealership city to save
+   * @param postalCode The dealership postal code to save
    */
   Future<void> saveDealershipData({
     required String name,
