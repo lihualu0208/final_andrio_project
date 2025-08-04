@@ -54,20 +54,41 @@
 
     <section class="multi-line-signature">
         
-<span class="returntype">void</span>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
 <span class="name ">main</span>(<wbr>)
 
         
 
     </section>
     
+<section class="desc markdown">
+  <p>Entry point of the Group Project App.</p>
+<p>Initializes all Floor databases (Car, Dealership, Customer),
+creates corresponding repositories/DAOs, and runs the app.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void main() {
-  runApp(const MyApp());
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  &#47;&#47; Initialize both databases
+  final carDatabase = await $FloorCarDatabase.databaseBuilder(&#39;car_database.db&#39;).build();
+  final dealershipDatabase = await $FloorDealershipDatabase.databaseBuilder(&#39;dealership_database.db&#39;).build();
+  final customerDatabase = await $FloorCustomerAppDatabase.databaseBuilder(&#39;customer_app_database.db&#39;).build();
+
+
+  final customerRepository = CustomerRepository(customerDatabase.customerDao);
+  final carRepository = CarRepository(carDatabase.carDao);
+  final dealershipDao = dealershipDatabase.dealershipDao;
+
+  runApp(MyApp(
+    carRepository: carRepository,
+    dealershipDao: dealershipDao,
+    customerRepository: customerRepository,
+  ));
 }</code></pre>
 </section>
 

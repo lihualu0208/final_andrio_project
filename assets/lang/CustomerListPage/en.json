@@ -12,6 +12,7 @@
   "delete": "Delete",
   "back": "Back",
   "selectCustomer": "Select a customer",
+  "noCustomers": "No customers found",
   "allFieldsRequired": "All fields are required",
   "customerAdded": "Customer added",
   "customerUpdated": "Customer updated",

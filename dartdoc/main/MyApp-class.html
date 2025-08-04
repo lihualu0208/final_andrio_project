@@ -53,6 +53,11 @@
 </h1></div>
 
     
+<section class="desc markdown">
+  <p>The root widget of the app.</p>
+<p>Sets up localization, theming, and provides access to repositories and DAOs
+needed by feature pages like Car, Dealership, Sales, and Customer.</p>
+</section>
 
 
     <section>
@@ -85,7 +90,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="MyApp.new" class="callable">
-          <span class="name"><a href="../main/MyApp/MyApp.html">MyApp.new</a></span><span class="signature">({<span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span></span>})</span>
+          <span class="name"><a href="../main/MyApp/MyApp.html">MyApp.new</a></span><span class="signature">({<span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="-param-carRepository"><span>required</span> <span class="type-annotation"><a href="../CarListPage_car_repository/CarRepository-class.html">CarRepository</a></span> <span class="parameter-name">carRepository</span>, </span><span class="parameter" id="-param-dealershipDao"><span>required</span> <span class="type-annotation"><a href="../DealershipPage_dealership_dao/DealershipDao-class.html">DealershipDao</a></span> <span class="parameter-name">dealershipDao</span>, </span><span class="parameter" id="-param-customerRepository"><span>required</span> <span class="type-annotation"><a href="../CustomerListPage_customer_repository/CustomerRepository-class.html">CustomerRepository</a></span> <span class="parameter-name">customerRepository</span></span>})</span>
         </dt>
         <dd>
           
@@ -95,10 +100,46 @@
   </section>
     
   <section
-      class="summary offset-anchor inherited"
+      class="summary offset-anchor"
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
+        <dt id="carRepository" class="property">
+  <span class="name"><a href="../main/MyApp/carRepository.html">carRepository</a></span>
+  <span class="signature">&#8594; <a href="../CarListPage_car_repository/CarRepository-class.html">CarRepository</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="customerRepository" class="property">
+  <span class="name"><a href="../main/MyApp/customerRepository.html">customerRepository</a></span>
+  <span class="signature">&#8594; <a href="../CustomerListPage_customer_repository/CustomerRepository-class.html">CustomerRepository</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="dealershipDao" class="property">
+  <span class="name"><a href="../main/MyApp/dealershipDao.html">dealershipDao</a></span>
+  <span class="signature">&#8594; <a href="../DealershipPage_dealership_dao/DealershipDao-class.html">DealershipDao</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
         <dt id="hashCode" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/widgets/Widget/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
@@ -159,7 +200,7 @@
 
         <dt id="createState" class="callable">
   <span class="name"><a href="../main/MyApp/createState.html">createState</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html">StatefulWidget</a></span>&gt;</span></span>
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../main/MyApp-class.html">MyApp</a></span>&gt;</span></span>
   </span>
   
 

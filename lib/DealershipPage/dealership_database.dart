@@ -9,11 +9,11 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'dealership_dao.dart';
 import 'car_dealership.dart';
 
-part 'app_database.g.dart';
+part 'dealership_database.g.dart';
 
 /// The main database class annotated with @Database
 @Database(version: 1, entities: [Dealership])
-abstract class AppDatabase extends FloorDatabase {
+abstract class DealershipDatabase extends FloorDatabase {
   /// Provides access to the dealership DAO
   DealershipDao get dealershipDao;
 }

@@ -6,29 +6,23 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Handles loading and accessing localized strings for the dealership management app.
-class AppLocalizations {
-  /// The current locale for translations
+/// Handles loading and accessing localized strings
+class DealershipLocalizations {
   final Locale locale;
-
-  /// Map storing all localized strings for the current locale
   late Map<String, String> _localizedStrings;
 
-  /// Creates an instance of AppLocalizations for the given locale
-  AppLocalizations(this.locale);
+  DealershipLocalizations(this.locale);
 
   /// Retrieves the AppLocalizations instance for the current context
-  static AppLocalizations? of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  static DealershipLocalizations? of(BuildContext context) {
+    return Localizations.of<DealershipLocalizations>(context, DealershipLocalizations);
   }
 
   /// The delegate for this localization class
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-  _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<DealershipLocalizations> delegate =
+  _DealershipLocalizationsDelegate();
 
   /// Loads translations from JSON file for the current locale
-  ///
-  /// Returns `true` if loading was successful, `false` otherwise
   Future<bool> load() async {
     try {
       final jsonString = await rootBundle
@@ -46,12 +40,7 @@ class AppLocalizations {
 
   /**
    * Translates a key to the current locale's string.
-   *
    * Optionally replaces placeholders with provided parameters.
-   *
-   * @param key The translation key to look up
-   * @param params Optional map of parameters to replace in the translated string
-   * @return The translated string with parameters replaced, or the key if no translation found
    */
   String translate(String key, {Map<String, String> params = const {}}) {
     var translation = _localizedStrings[key] ?? key;
@@ -61,25 +50,26 @@ class AppLocalizations {
     return translation;
   }
 
-  /// Checks if a translation key exists in the current locale
+  /// Checks if a translation key exists
   bool containsKey(String key) => _localizedStrings.containsKey(key);
 }
 
 /// The delegate for loading AppLocalizations
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
-  const _AppLocalizationsDelegate();
+class _DealershipLocalizationsDelegate
+    extends LocalizationsDelegate<DealershipLocalizations> {
+  const _DealershipLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) => true;
+  bool isSupported(Locale locale) => ['en', 'de'].contains(locale.languageCode);
+
 
   @override
-  Future<AppLocalizations> load(Locale locale) async {
-    final localizations = AppLocalizations(locale);
+  Future<DealershipLocalizations> load(Locale locale) async {
+    final localizations = DealershipLocalizations(locale);
     await localizations.load();
     return localizations;
   }
 
   @override
-  bool shouldReload(_AppLocalizationsDelegate old) => false;
+  bool shouldReload(_DealershipLocalizationsDelegate old) => false;
 }

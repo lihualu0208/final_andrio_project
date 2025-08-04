@@ -5,8 +5,15 @@
 /// between sessions. This allows for features like "copy previous customer" functionality.
 
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
+import 'customer_dao.dart';
 
 class CustomerRepository {
+  final CustomerDao _dao;
+
+  CustomerRepository(this._dao);
+
+  CustomerDao get dao => _dao;
+
   // Keys
   static const _firstNameKey = 'customer_firstName';
   static const _lastNameKey = 'customer_lastName';
@@ -33,7 +40,7 @@ class CustomerRepository {
 
   final EncryptedSharedPreferences _prefs = EncryptedSharedPreferences();
 
-/// Loads all customer data from encrypted shared preferences.
+  /// Loads all customer data from encrypted shared preferences.
   Future<void> loadData() async {
     _firstName = (await _prefs.getString(_firstNameKey)) ?? '';
     _lastName = (await _prefs.getString(_lastNameKey)) ?? '';
@@ -66,16 +73,9 @@ class CustomerRepository {
   }
 
   /// Setters
-  /// Sets the customer's first name.
   set firstName(String value) => _firstName = value.trim();
-
-  /// Sets the customer's last name.
   set lastName(String value) => _lastName = value.trim();
-
-  /// Sets the customer's address.
   set address(String value) => _address = value.trim();
-
-  /// Sets the customer's birthday.
   set birthday(String value) => _birthday = value.trim();
 
   /// Saves complete customer data to encrypted shared preferences.

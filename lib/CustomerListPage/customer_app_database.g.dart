@@ -6,33 +6,34 @@ part of 'customer_app_database.dart';
 // FloorGenerator
 // **************************************************************************
 
-abstract class $AppDatabaseBuilderContract {
+abstract class $CustomerAppDatabaseBuilderContract {
   /// Adds migrations to the builder.
-  $AppDatabaseBuilderContract addMigrations(List<Migration> migrations);
+  $CustomerAppDatabaseBuilderContract addMigrations(List<Migration> migrations);
 
   /// Adds a database [Callback] to the builder.
-  $AppDatabaseBuilderContract addCallback(Callback callback);
+  $CustomerAppDatabaseBuilderContract addCallback(Callback callback);
 
   /// Creates the database and initializes it.
-  Future<AppDatabase> build();
+  Future<CustomerAppDatabase> build();
 }
 
 // ignore: avoid_classes_with_only_static_members
-class $FloorAppDatabase {
+class $FloorCustomerAppDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static $AppDatabaseBuilderContract databaseBuilder(String name) =>
-      _$AppDatabaseBuilder(name);
+  static $CustomerAppDatabaseBuilderContract databaseBuilder(String name) =>
+      _$CustomerAppDatabaseBuilder(name);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static $AppDatabaseBuilderContract inMemoryDatabaseBuilder() =>
-      _$AppDatabaseBuilder(null);
+  static $CustomerAppDatabaseBuilderContract inMemoryDatabaseBuilder() =>
+      _$CustomerAppDatabaseBuilder(null);
 }
 
-class _$AppDatabaseBuilder implements $AppDatabaseBuilderContract {
-  _$AppDatabaseBuilder(this.name);
+class _$CustomerAppDatabaseBuilder
+    implements $CustomerAppDatabaseBuilderContract {
+  _$CustomerAppDatabaseBuilder(this.name);
 
   final String? name;
 
@@ -41,23 +42,24 @@ class _$AppDatabaseBuilder implements $AppDatabaseBuilderContract {
   Callback? _callback;
 
   @override
-  $AppDatabaseBuilderContract addMigrations(List<Migration> migrations) {
+  $CustomerAppDatabaseBuilderContract addMigrations(
+      List<Migration> migrations) {
     _migrations.addAll(migrations);
     return this;
   }
 
   @override
-  $AppDatabaseBuilderContract addCallback(Callback callback) {
+  $CustomerAppDatabaseBuilderContract addCallback(Callback callback) {
     _callback = callback;
     return this;
   }
 
   @override
-  Future<AppDatabase> build() async {
+  Future<CustomerAppDatabase> build() async {
     final path = name != null
         ? await sqfliteDatabaseFactory.getDatabasePath(name!)
         : ':memory:';
-    final database = _$AppDatabase();
+    final database = _$CustomerAppDatabase();
     database.database = await database.open(
       path,
       _migrations,
@@ -67,8 +69,8 @@ class _$AppDatabaseBuilder implements $AppDatabaseBuilderContract {
   }
 }
 
-class _$AppDatabase extends AppDatabase {
-  _$AppDatabase([StreamController<String>? listener]) {
+class _$CustomerAppDatabase extends CustomerAppDatabase {
+  _$CustomerAppDatabase([StreamController<String>? listener]) {
     changeListener = listener ?? StreamController<String>.broadcast();
   }
 

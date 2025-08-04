@@ -1,14 +1,22 @@
-// customer_locale_provider.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'customr_AppLocalizations.dart'; // Note: Fixed filename casing to match your actual file
+import 'customr_AppLocalizations.dart';
 
-class LocaleProvider with ChangeNotifier {
+/// A provider that manages the user's selected locale for the customer module.
+///
+/// It uses [SharedPreferences] to persist the selected locale across app restarts,
+/// and notifies listeners when the locale changes.
+class CustomerLocaleProvider with ChangeNotifier {
   Locale? _locale;
   final String _prefKey = 'languageCode';
 
+  /// Gets the currently selected locale, or null if not set.
   Locale? get locale => _locale;
 
+  /// Loads the saved locale from shared preferences, if available.
+  ///
+  /// If the stored language code is valid, it updates [_locale] and
+  /// notifies listeners. Falls back to `'en'` if loading fails.
   Future<void> loadLocale() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -26,9 +34,13 @@ class LocaleProvider with ChangeNotifier {
     }
   }
 
+  /// Sets a new locale and persists it using shared preferences.
+  ///
+  /// Returns `true` if successful, `false` if the locale is not supported
+  /// or an error occurs.
   Future<bool> setLocale(Locale locale) async {
     try {
-      if (!AppLocalizations.supportedLocales.contains(locale)) {
+      if (!CustomrApplocalizations.supportedLocales.contains(locale)) {
         return false;
       }
 
@@ -43,6 +55,9 @@ class LocaleProvider with ChangeNotifier {
     }
   }
 
+  /// Clears the saved locale from preferences and resets [_locale] to null.
+  ///
+  /// Returns `true` if successful, or `false` if an error occurs.
   Future<bool> clearLocale() async {
     try {
       _locale = null;

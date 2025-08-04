@@ -53,6 +53,11 @@
 </h1></div>
 
     
+<section class="desc markdown">
+  <p>A page that displays a list of customers and their details.</p>
+<p>This page supports localization, responsive layouts,
+and the ability to add, edit, delete, and reuse customer data.</p>
+</section>
 
 
     <section>
@@ -85,10 +90,10 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="CustomerListPage.new" class="callable">
-          <span class="name"><a href="../CustomerListPage_customer_list_page/CustomerListPage/CustomerListPage.html">CustomerListPage.new</a></span><span class="signature">({<span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="-param-customerDao"><span>required</span> <span class="type-annotation"><a href="../CustomerListPage_customer_dao/CustomerDao-class.html">CustomerDao</a></span> <span class="parameter-name">customerDao</span></span>})</span>
+          <span class="name"><a href="../CustomerListPage_customer_list_page/CustomerListPage/CustomerListPage.html">CustomerListPage.new</a></span><span class="signature">({<span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="-param-repository"><span>required</span> <span class="type-annotation"><a href="../CustomerListPage_customer_repository/CustomerRepository-class.html">CustomerRepository</a></span> <span class="parameter-name">repository</span>, </span><span class="parameter" id="-param-forcedLocale"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span> <span class="parameter-name">forcedLocale</span>, </span><span class="parameter" id="-param-onLocaleChange"><span>required</span> <span class="type-annotation">void</span> <span class="parameter-name">onLocaleChange</span>(<span class="parameter" id="param-"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span></span>)</span>})</span>
         </dt>
         <dd>
-          Creates a <a href="../CustomerListPage_customer_list_page/CustomerListPage-class.html">CustomerListPage</a> with the given <code>customerDao</code>.
+          
             <div class="constructor-modifier features">const</div>
         </dd>
     </dl>
@@ -99,14 +104,14 @@
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
-        <dt id="customerDao" class="property">
-  <span class="name"><a href="../CustomerListPage_customer_list_page/CustomerListPage/customerDao.html">customerDao</a></span>
-  <span class="signature">&#8594; <a href="../CustomerListPage_customer_dao/CustomerDao-class.html">CustomerDao</a></span>
+        <dt id="forcedLocale" class="property">
+  <span class="name"><a href="../CustomerListPage_customer_list_page/CustomerListPage/forcedLocale.html">forcedLocale</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span>
   
 
 </dt>
 <dd>
-  The <a href="../CustomerListPage_customer_dao/CustomerDao-class.html">CustomerDao</a> instance used for database operations.
+  The locale that should be forced for this page.
   <div class="features"><span class="feature">final</span></div>
 
 </dd>
@@ -132,6 +137,30 @@
 <dd class="inherited">
   Controls how one widget replaces another widget in the tree.
   <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="onLocaleChange" class="property">
+  <span class="name"><a href="../CustomerListPage_customer_list_page/CustomerListPage/onLocaleChange.html">onLocaleChange</a></span>
+  <span class="signature">&#8594; void Function<span class="signature">(<span class="parameter" id="param-"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span></span>)</span></span>
+  
+
+</dt>
+<dd>
+  A callback to trigger locale changes externally.
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="repository" class="property">
+  <span class="name"><a href="../CustomerListPage_customer_list_page/CustomerListPage/repository.html">repository</a></span>
+  <span class="signature">&#8594; <a href="../CustomerListPage_customer_repository/CustomerRepository-class.html">CustomerRepository</a></span>
+  
+
+</dt>
+<dd>
+  The customer repository to interact with the database and saved preferences.
+  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 

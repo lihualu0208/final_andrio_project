@@ -20,6 +20,10 @@ class CarLocaleProvider {
   /// Constructor for CarLocaleProvider.
   CarLocaleProvider(this.locale);
 
+  static CarLocaleProvider of(BuildContext context) {
+    return Localizations.of<CarLocaleProvider>(context, CarLocaleProvider)!;
+  }
+
   /// The delegate for loading localized data.
   static const LocalizationsDelegate<CarLocaleProvider> delegate = _CarLocaleDelegate();
 

@@ -55,186 +55,95 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
-<span class="name ">listPage</span>(<wbr>)
+<span class="name ">listPage</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="listPage-param-loc"><span class="type-annotation"><a href="../../SalesPage_AppLocalizations/AppLocalizations-class.html">AppLocalizations</a></span> <span class="parameter-name">loc</span></span></li>
+</ol>)
 
       
 
     </section>
     
 <section class="desc markdown">
-  <p>Widget to return the list portion of the page, containing input textFields
-for record fields an add button to add record to database and list, and
-the output of the list of returned SalesRecords objects for viewing and selection
-to display in detailsPage widget</p>
+  <p>Builds the list panel UI containing:</p>
+<ul>
+<li>Input fields for new sales record (Title, CustID, CarID, DID, Date)</li>
+<li>Add button to insert new record</li>
+<li>Scrollable list of existing sales records</li>
+</ul>
+<p>Tapping on a list item will show its details.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Widget listPage(){
+  <pre class="language-dart"><code class="language-dart">Widget listPage(AppLocalizations loc) {
   return Column(children: [
     Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children:[
-
-          Expanded(child: TextField(
-            controller: _controller0,
-            decoration: InputDecoration(
-                hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;Title&#39;)}&quot;,
-                border: OutlineInputBorder()
-            ),
-          )),
-
-          Expanded(child: TextField(
-            controller: _controller1,
-            decoration: InputDecoration(
-                hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;CustID&#39;)}&quot;,
-                border: OutlineInputBorder()
-            ),
-          )),
-
-          Expanded(child: TextField(
-              controller: _controller2,
-              decoration: InputDecoration(
-                  hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;CarID&#39;)}&quot;,
-                  border: OutlineInputBorder()
-
-              ))
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(child: TextField(
+          controller: _controller0,
+          decoration: InputDecoration(
+            hintText: loc.translate(&#39;Title&#39;),
+            border: const OutlineInputBorder(),
           ),
-          Expanded(child: TextField(
-              controller: _controller3,
-              decoration: InputDecoration(
-                  hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;DID&#39;)}&quot;,
-                  border: OutlineInputBorder()
-
-              ))
+        )),
+        Expanded(child: TextField(
+          controller: _controller1,
+          decoration: InputDecoration(
+            hintText: loc.translate(&#39;CustID&#39;),
+            border: const OutlineInputBorder(),
           ),
-          Expanded(child: TextField(
-              controller: _controller4,
-              decoration: InputDecoration(
-                  hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;Date&#39;)}&quot;,
-                  border: OutlineInputBorder()
-
-              ))
+        )),
+        Expanded(child: TextField(
+          controller: _controller2,
+          decoration: InputDecoration(
+            hintText: loc.translate(&#39;CarID&#39;),
+            border: const OutlineInputBorder(),
           ),
-
-          ElevatedButton(
-              onPressed: () {
-                if (_controller0.text.trim().isEmpty ||
-                    _controller1.text.trim().isEmpty ||
-                    _controller2.text.trim().isEmpty ||
-                    _controller3.text.trim().isEmpty ||
-                    _controller4.text.trim().isEmpty){
-                  &#47;&#47;&#47;a snackBar item to reveal a popup to notify of empty fields
-                  var popUp = SnackBar(
-                    content: Text(&quot;${AppLocalizations.of(context)!.translate(&#39;FailMsg&#39;)}&quot;),
-                    duration: Duration(seconds: 60),
-                    action: SnackBarAction(label: &quot;OK&quot;, onPressed: () {
-                      ScaffoldMessenger.of(context)
-                          .hideCurrentSnackBar();}),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(popUp);
-                } else if (_controller0.text.trim().isNotEmpty ||
-                    _controller1.text.trim().isNotEmpty ||
-                    _controller2.text.trim().isNotEmpty ||
-                    _controller3.text.trim().isNotEmpty ||
-                    _controller4.text.trim().isEmpty){
-                  &#47;&#47;&#47;variable to hold input in Title textfield
-                  var inputTitle = _controller0.value.text;
-                  &#47;&#47;&#47;variable to hold input in Customer ID textfield
-                  var inputCustID = _controller1.value.text;
-                  &#47;&#47;&#47;variable to hold input in CarID textfield
-                  var inputCarID = _controller2.value.text;
-                  &#47;&#47;&#47;variable to hold input in Dealer ID textfield
-                  var inputDealerID = _controller3.value.text;
-                  &#47;&#47;&#47;variable to hold input in date textfield
-                  var inputDate = _controller4.value.text;
-
-                  &#47;&#47;&#47;instance of EncryptedSharedPreferences to store
-                  &#47;&#47;&#47;previous inputs for autofill upon page reaccess based
-                  &#47;&#47;&#47;on user choice
-                  final prefs = EncryptedSharedPreferences();
-                  showDialog(context: context,
-                      builder: (BuildContext context) =&gt; AlertDialog(
-
-                        content: Text(&quot;${AppLocalizations.of(context)!.translate(&#39;Save&#39;)}&quot;),
-                        actions: &lt;Widget&gt;[
-
-                          ElevatedButton(onPressed: () {
-                            prefs.setString(&quot;SalesPageTitle&quot;, inputTitle);
-                            prefs.setString(&quot;SalesPageCustID&quot;, inputCustID);
-                            prefs.setString(&quot;SalesPageCarID&quot;, inputCarID);
-                            prefs.setString(&quot;SalesPageDID&quot;, inputDealerID);
-                            prefs.setString(&quot;SalesPageDate&quot;, inputDate);
-                            Navigator.pop(context);
-                          }, child: Text(&quot;${AppLocalizations.of(context)!.translate(&#39;Yes&#39;)}&quot;)),
-
-                          ElevatedButton(onPressed: () {
-                            prefs.clear();
-                            Navigator.pop(context);
-                          }, child: Text(&quot;${AppLocalizations.of(context)!.translate(&#39;No&#39;)}&quot;))
-                        ],
-                      ));
-                  setState(() {
-                    &#47;&#47;&#47;create new object of SalesRecord class to add to
-                    &#47;&#47;&#47;database
-                    var newRecord = SalesRecords(
-                        SalesRecords.ID++,
-                        inputTitle,
-                        int.parse(inputCustID),
-                        int.parse(inputCarID),
-                        int.parse(inputDealerID),
-                        inputDate
-                    );
-                    daoObj.addSalesRecord(newRecord);
-                    records.add(newRecord);
-                  });
-                  _controller0.text = &quot;&quot;;
-                  _controller1.text = &quot;&quot;;
-                  _controller2.text = &quot;&quot;;
-                  _controller3.text = &quot;&quot;;
-                  _controller4.text = &quot;&quot;;
-                }
-
-              },
-              child: Text(&quot;${AppLocalizations.of(context)!.translate(&#39;Add&#39;)}&quot;)
+        )),
+        Expanded(child: TextField(
+          controller: _controller3,
+          decoration: InputDecoration(
+            hintText: loc.translate(&#39;DID&#39;),
+            border: const OutlineInputBorder(),
           ),
-
-        ]),
-
-
-    Expanded(child:
-    ListView.builder(
+        )),
+        Expanded(child: TextField(
+          controller: _controller4,
+          decoration: InputDecoration(
+            hintText: loc.translate(&#39;Date&#39;),
+            border: const OutlineInputBorder(),
+          ),
+        )),
+        ElevatedButton(
+          onPressed: addRecord,
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.black,
+          ),
+          child: Text(loc.translate(&#39;Add&#39;) ?? &quot;Add&quot;),
+        ),
+      ],
+    ),
+    Expanded(
+      child: ListView.builder(
         itemCount: records.length,
-        itemBuilder: (context, rowNumber) {
-          if (records.isEmpty) {
-            return Row(
+        itemBuilder: (context, i) {
+          return GestureDetector(
+            onTap: () =&gt; setState(() {
+              selectedItem = records[i];
+            }),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Text(&quot;${AppLocalizations.of(context)!.translate(&#39;NoVals&#39;)}&quot;)],
-            );
-
-          } else if (records.isNotEmpty){
-            return GestureDetector(
-                onTap: (){
-                  setState(() {
-                    selectedItem = records[rowNumber];
-                  });
-                },
-
-                child:
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(&quot;${rowNumber+1}: ${records[rowNumber].title}&quot;)
-                  ],
-                )
-            );
-          }
-        }
-    )
-    )
-  ],);
+              children: [
+                Text(&quot;${i + 1}: ${records[i].title}&quot;),
+              ],
+            ),
+          );
+        },
+      ),
+    ),
+  ]);
 }</code></pre>
 </section>
 

@@ -1,155 +1,191 @@
-/// customer_list_page.dart
-/// The main page of the Customer Management application.
-///
-/// This widget provides functionality to:
-/// - View a list of all customers
-/// - Add new customers
-/// - Edit existing customers
-/// - Delete customers
-/// - View customer details in a responsive layout
-/// - Switch between languages (English/Chinese)
-///
-/// The layout adapts to different screen sizes, showing a side-by-side view
-/// on larger screens and a stacked view on smaller devices.
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'customer.dart';
-import 'customer_dao.dart';
 import 'customer_repository.dart';
 import 'customr_AppLocalizations.dart';
-import 'customer_locale_provider.dart';
 
+/// A page that displays a list of customers and their details.
+///
+/// This page supports localization, responsive layouts,
+/// and the ability to add, edit, delete, and reuse customer data.
 class CustomerListPage extends StatefulWidget {
-  /// The [CustomerDao] instance used for database operations.
-  final CustomerDao customerDao;
-  /// Creates a [CustomerListPage] with the given [customerDao].
-  ///
-  /// The [customerDao] must not be null.
-  const CustomerListPage({super.key, required this.customerDao});
+  /// The customer repository to interact with the database and saved preferences.
+  final CustomerRepository repository;
+  /// The locale that should be forced for this page.
+  final Locale forcedLocale;
+  /// A callback to trigger locale changes externally.
+  final void Function(Locale) onLocaleChange;
+
+  const CustomerListPage({
+    Key? key,
+    required this.repository,
+    required this.forcedLocale,
+    required this.onLocaleChange,
+  }) : super(key: key);
 
   @override
   State<CustomerListPage> createState() => _CustomerListPageState();
 }
-/// The state class for [CustomerListPage].
-///
-/// Manages:
-/// - The list of customers
-/// - The currently selected customer
-/// - The customer repository for temporary data storage
-/// - The responsive layout state
 
 class _CustomerListPageState extends State<CustomerListPage> {
-  final CustomerRepository _customerRepo = CustomerRepository();
   final List<Customer> _customers = [];
+  late CustomrApplocalizations loc;
   bool _hasPreviousCustomer = false;
   Customer? _selectedCustomer;
 
-  /// Loads all customers from the database and updates the UI.
-  ///
-  /// Also sets the [Customer.currentId] to the next available ID.
   @override
   void initState() {
     super.initState();
     _loadCustomers();
     _checkPreviousCustomer();
   }
+
   /// Loads all customers from the database and updates the UI.
-  ///
-  /// Also sets the [Customer.currentId] to the next available ID.
   Future<void> _loadCustomers() async {
-    final customers = await widget.customerDao.findAllCustomers();
+    final customers = await widget.repository.dao.findAllCustomers();
     setState(() {
       _customers.clear();
       _customers.addAll(customers);
     });
 
-    final maxId = await widget.customerDao.findMaxId();
+    final maxId = await widget.repository.dao.findMaxId();
     Customer.currentId = (maxId ?? 0) + 1;
   }
-  /// Checks if there's previous customer data available to reuse.
+
+  /// Checks if previously saved customer data exists.
   Future<void> _checkPreviousCustomer() async {
-    await _customerRepo.loadData();
+    await widget.repository.loadData();
     setState(() {
-      _hasPreviousCustomer = _customerRepo.firstName.isNotEmpty;
+      _hasPreviousCustomer = widget.repository.firstName.isNotEmpty;
     });
   }
 
-  /// Builds a responsive layout based on screen size.
-  ///
-  /// On large screens (width > height and width > 720), shows a side-by-side
-  /// view of the customer list and details. On smaller screens, shows either
-  /// the list or details view.
+  /// Builds the responsive layout: split view on wide screens, single view on narrow.
   Widget _reactiveLayout() {
     final size = MediaQuery.of(context).size;
-    final width = size.width;
-    final height = size.height;
+    final isWide = size.width > size.height && size.width > 720;
 
-    if ((width > height) && (width > 720)) {
-      return Row(
-        children: [
-          Expanded(flex: 1, child: _buildCustomerList()),
-          Expanded(
-            flex: 1,
-            child: _selectedCustomer == null
-                ? Center(child: Text(AppLocalizations.of(context)!.translate('selectCustomer')))
-                : _buildCustomerDetails(_selectedCustomer!),
+    return Row(
+      children: [
+        // Left panel: Customer list and buttons
+        Container(
+          width: isWide ? 400 : size.width,
+          color: const Color(0xFFF0F0F5),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: _buildCustomerList(),
+              ),
+              Positioned(
+                bottom: 24,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FloatingActionButton.small(
+                      heroTag: 'add_customer',
+                      backgroundColor: const Color(0xFFDDE8FF),
+                      foregroundColor: Colors.black,
+                      onPressed: () => _showAddCustomerDialog(),
+                      child: const Icon(Icons.add),
+                    ),
+                    if (_hasPreviousCustomer) ...[
+                      const SizedBox(width: 7),
+                      FloatingActionButton.small(
+                        heroTag: 'copy_previous',
+                        backgroundColor: const Color(0xFFDDE8FF),
+                        foregroundColor: Colors.black,
+                        onPressed: () => _showAddCustomerDialog(usePrevious: true),
+                        tooltip: loc.translate('usePrevious'),
+                        child: const Icon(Icons.content_copy),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      );
-    } else {
-      // return _buildCustomerList();
-      return _selectedCustomer == null
-          ? _buildCustomerList()
-          : _buildCustomerDetails(_selectedCustomer!);
-    }
-  }
-  /// Builds a scrollable list of customers.
-  ///
-  /// Each customer is displayed in a [Card] with their name and address.
-  /// Tapping a customer selects it for viewing/editing.
+        ),
 
+        // Right: Detail
+        if (isWide)
+          Expanded(
+            child: Container(
+              color: const Color(0xFFE1E2E7),
+              child: _selectedCustomer == null
+                  ? Center(
+                child: Text(
+                  loc.translate('selectCustomer'),
+                  style: const TextStyle(color: Colors.black54),
+                ),
+              )
+                  : _buildCustomerDetails(_selectedCustomer!),
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// Builds the scrollable list of customer cards.
   Widget _buildCustomerList() {
+    if (_customers.isEmpty) {
+      return Center(
+        child: Text(
+          loc.translate('noCustomers'),
+          style: const TextStyle(
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
       itemCount: _customers.length,
       itemBuilder: (context, index) {
         final customer = _customers[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ListTile(
-            title: Text('${customer.firstName} ${customer.lastName}'),
-            subtitle: Text(customer.address),
-            onTap: () => setState(() => _selectedCustomer = customer),
+        return GestureDetector(
+          onTap: () => setState(() => _selectedCustomer = customer),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.grey.shade300),
+            ),
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("${customer.firstName} ${customer.lastName}",
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(customer.address, style: const TextStyle(color: Colors.black54)),
+                ],
+              ),
+            ),
           ),
         );
       },
     );
   }
-  /// Builds a detailed view of a customer.
-  ///
-  /// Displays all customer information and provides buttons for:
-  /// - Editing the customer
-  /// - Deleting the customer
-  /// - Returning to the list (on small screens)
 
+
+  /// Builds a panel showing detailed information for a selected customer.
   Widget _buildCustomerDetails(Customer customer) {
-    final loc = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${loc.translate('firstName')}: ${customer.firstName}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text('${loc.translate('firstName')}: ${customer.firstName}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          Text('${loc.translate('lastName')}: ${customer.lastName}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text('${loc.translate('lastName')}: ${customer.lastName}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          Text('${loc.translate('address')}: ${customer.address}',
-              style: const TextStyle(fontSize: 16)),
+          Text('${loc.translate('address')}: ${customer.address}', style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 12),
-          Text('${loc.translate('birthday')}: ${customer.birthday}',
-              style: const TextStyle(fontSize: 16)),
+          Text('${loc.translate('birthday')}: ${customer.birthday}', style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -160,7 +196,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await widget.customerDao.deleteCustomer(customer);
+                  await widget.repository.dao.deleteCustomer(customer);
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('${loc.translate('customerDeleted')}: ${customer.firstName} ${customer.lastName}')),
@@ -170,8 +206,7 @@ class _CustomerListPageState extends State<CustomerListPage> {
                   }
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: Text(loc.translate('delete'),
-                    style: const TextStyle(color: Colors.white)),
+                child: Text(loc.translate('delete'), style: const TextStyle(color: Colors.white)),
               ),
               if (!(MediaQuery.of(context).size.width > 720))
                 ElevatedButton(
@@ -185,29 +220,29 @@ class _CustomerListPageState extends State<CustomerListPage> {
     );
   }
 
-  /// Shows a dialog for selecting the application language.
+  /// Shows a dialog allowing the user to choose between supported languages.
+  ///
+  /// Updates the locale by calling [widget.onLocaleChange] and closes the dialog.
   void _showLanguageDialog() {
-    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(loc.translate('language')),
+        backgroundColor: const Color(0xFFDFDFE4),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               title: Text(loc.translate('english')),
               onTap: () {
-                Provider.of<LocaleProvider>(context, listen: false)
-                    .setLocale(const Locale('en'));
+                widget.onLocaleChange(const Locale('en'));
                 Navigator.pop(context);
               },
             ),
             ListTile(
               title: Text(loc.translate('chinese')),
               onTap: () {
-                Provider.of<LocaleProvider>(context, listen: false)
-                    .setLocale(const Locale('zh'));
+                widget.onLocaleChange(const Locale('zh'));
                 Navigator.pop(context);
               },
             ),
@@ -217,154 +252,67 @@ class _CustomerListPageState extends State<CustomerListPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.translate('appTitle')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: _showLanguageDialog,
-            tooltip: loc.translate('language'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: _showInstructions,
-            tooltip: loc.translate('instructionsTitle'),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: _reactiveLayout(),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag: 'add_customer',
-            onPressed: () => _showAddCustomerDialog(),
-            child: const Icon(Icons.add),
-          ),
-          if (_hasPreviousCustomer) ...[
-            const SizedBox(height: 10),
-            FloatingActionButton(
-              heroTag: 'copy_previous',
-              onPressed: () => _showAddCustomerDialog(usePrevious: true),
-              child: const Icon(Icons.content_copy),
-              tooltip: loc.translate('usePrevious'),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  /// Shows a dialog for adding a new customer.
+  /// Shows a dialog to add a new customer.
   ///
-  /// If [usePrevious] is true, pre-fills the form with data from the last
-  /// saved customer.
-
+  /// If [usePrevious] is true and previous data exists, pre-fills the form with that data.
+  /// Saves the new customer to the database and updates the UI.
   void _showAddCustomerDialog({bool usePrevious = false}) {
-    final loc = AppLocalizations.of(context)!;
     final firstNameController = TextEditingController();
     final lastNameController = TextEditingController();
     final addressController = TextEditingController();
     final birthdayController = TextEditingController();
 
     if (usePrevious && _hasPreviousCustomer) {
-      firstNameController.text = _customerRepo.firstName;
-      lastNameController.text = _customerRepo.lastName;
-      addressController.text = _customerRepo.address;
-      birthdayController.text = _customerRepo.birthday;
+      firstNameController.text = widget.repository.firstName;
+      lastNameController.text = widget.repository.lastName;
+      addressController.text = widget.repository.address;
+      birthdayController.text = widget.repository.birthday;
     }
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(loc.translate('addCustomer')),
+        backgroundColor: const Color(0xFFDFDFE4),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: firstNameController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('firstName'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
+              TextField(controller: firstNameController, decoration: InputDecoration(labelText: loc.translate('firstName'))),
               const SizedBox(height: 16),
-              TextField(
-                controller: lastNameController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('lastName'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
+              TextField(controller: lastNameController, decoration: InputDecoration(labelText: loc.translate('lastName'))),
               const SizedBox(height: 16),
-              TextField(
-                controller: addressController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('address'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
+              TextField(controller: addressController, decoration: InputDecoration(labelText: loc.translate('address'))),
               const SizedBox(height: 16),
-              TextField(
-                controller: birthdayController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('birthday'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
+              TextField(controller: birthdayController, decoration: InputDecoration(labelText: loc.translate('birthday'))),
             ],
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(loc.translate('cancel')),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(loc.translate('cancel'))),
           ElevatedButton(
             onPressed: () async {
-              final firstName = firstNameController.text.trim();
-              final lastName = lastNameController.text.trim();
-              final address = addressController.text.trim();
-              final birthday = birthdayController.text.trim();
-
-              if (firstName.isEmpty || lastName.isEmpty || address.isEmpty || birthday.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(loc.translate('allFieldsRequired'))),
-                );
-                return;
-              }
-
               final newCustomer = Customer(
                 id: Customer.currentId++,
-                firstName: firstName,
-                lastName: lastName,
-                address: address,
-                birthday: birthday,
+                firstName: firstNameController.text.trim(),
+                lastName: lastNameController.text.trim(),
+                address: addressController.text.trim(),
+                birthday: birthdayController.text.trim(),
               );
-
-              await widget.customerDao.insertCustomer(newCustomer);
-              await _customerRepo.saveCustomerData(
-                firstName: firstName,
-                lastName: lastName,
-                address: address,
-                birthday: birthday,
+              await widget.repository.dao.insertCustomer(newCustomer);
+              await widget.repository.saveCustomerData(
+                firstName: newCustomer.firstName,
+                lastName: newCustomer.lastName,
+                address: newCustomer.address,
+                birthday: newCustomer.birthday,
               );
-
               if (mounted) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${loc.translate('customerAdded')}: $firstName $lastName')),
-                );
                 _loadCustomers();
                 _checkPreviousCustomer();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('${loc.translate('customerAdded')}: ${newCustomer.firstName} ${newCustomer.lastName}'),
+                ));
               }
             },
             child: Text(loc.translate('save')),
@@ -374,10 +322,10 @@ class _CustomerListPageState extends State<CustomerListPage> {
     );
   }
 
-  /// Shows a dialog for editing an existing customer.
-
+  /// Shows a dialog to edit an existing [customer]'s details.
+  ///
+  /// Updates the customer in the database and refreshes the UI.
   void _showEditCustomerDialog(Customer customer) {
-    final loc = AppLocalizations.of(context)!;
     final firstNameController = TextEditingController(text: customer.firstName);
     final lastNameController = TextEditingController(text: customer.lastName);
     final addressController = TextEditingController(text: customer.address);
@@ -387,75 +335,45 @@ class _CustomerListPageState extends State<CustomerListPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(loc.translate('editCustomer')),
+        backgroundColor: const Color(0xFFDFDFE4),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: firstNameController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('firstName'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
+              TextField(controller: firstNameController, decoration: InputDecoration(labelText: loc.translate('firstName'))),
               const SizedBox(height: 16),
-              TextField(
-                controller: lastNameController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('lastName'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
+              TextField(controller: lastNameController, decoration: InputDecoration(labelText: loc.translate('lastName'))),
               const SizedBox(height: 16),
-              TextField(
-                controller: addressController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('address'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
+              TextField(controller: addressController, decoration: InputDecoration(labelText: loc.translate('address'))),
               const SizedBox(height: 16),
-              TextField(
-                controller: birthdayController,
-                decoration: InputDecoration(
-                  labelText: loc.translate('birthday'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
+              TextField(controller: birthdayController, decoration: InputDecoration(labelText: loc.translate('birthday'))),
             ],
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(loc.translate('cancel')),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(loc.translate('cancel'))),
           ElevatedButton(
             onPressed: () async {
-              final updatedCustomer = Customer(
+              final updated = Customer(
                 id: customer.id,
                 firstName: firstNameController.text.trim(),
                 lastName: lastNameController.text.trim(),
                 address: addressController.text.trim(),
                 birthday: birthdayController.text.trim(),
               );
-
-              await widget.customerDao.updateCustomer(updatedCustomer);
-              await _customerRepo.saveCustomerData(
-                firstName: updatedCustomer.firstName,
-                lastName: updatedCustomer.lastName,
-                address: updatedCustomer.address,
-                birthday: updatedCustomer.birthday,
+              await widget.repository.dao.updateCustomer(updated);
+              await widget.repository.saveCustomerData(
+                firstName: updated.firstName,
+                lastName: updated.lastName,
+                address: updated.address,
+                birthday: updated.birthday,
               );
-
               if (mounted) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(loc.translate('customerUpdated'))),
-                );
+                setState(() => _selectedCustomer = updated);
                 _loadCustomers();
                 _checkPreviousCustomer();
-                setState(() => _selectedCustomer = updatedCustomer);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.translate('customerUpdated'))));
               }
             },
             child: Text(loc.translate('update')),
@@ -464,26 +382,76 @@ class _CustomerListPageState extends State<CustomerListPage> {
       ),
     );
   }
-  /// Shows application instructions in a dialog.
+
+  /// Displays an instruction dialog with helpful information for users.
   void _showInstructions() {
-    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(loc.translate('instructionsTitle')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(loc.translate('instructions')),
-          ],
-        ),
+          backgroundColor: const Color(0xFFDFDFE4),
+        content: Text(loc.translate('instructions')),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(loc.translate('gotIt')),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(loc.translate('gotIt'))),
         ],
+      ),
+    );
+  }
+
+  /// Builds the root UI for the page with localization override.
+  ///
+  /// This method injects localized strings using [CustomrApplocalizations].
+  @override
+  Widget build(BuildContext context) {
+    return Localizations.override(
+      context: context,
+      locale: widget.forcedLocale,
+      delegates: const [
+        CustomrApplocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      child: Builder(
+        builder: (overrideContext) {
+          loc = CustomrApplocalizations.of(overrideContext)!;
+          return Scaffold(
+            backgroundColor: const Color(0xFFDFDFE4),
+            appBar: AppBar(
+              title: Text(loc.translate('appTitle')),
+              backgroundColor: const Color(0xFFDFDFE4),
+              actions: [
+                IconButton(icon: const Icon(Icons.language), onPressed: _showLanguageDialog),
+                IconButton(icon: const Icon(Icons.help_outline), onPressed: _showInstructions),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _reactiveLayout(),
+            ),
+            floatingActionButton: MediaQuery.of(context).size.width > 720
+                ? null // FABs already shown in left panel for wide layout
+                : Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  heroTag: 'add_customer',
+                  onPressed: () => _showAddCustomerDialog(),
+                  child: const Icon(Icons.add),
+                ),
+                if (_hasPreviousCustomer) ...[
+                  const SizedBox(height: 10),
+                  FloatingActionButton(
+                    heroTag: 'copy_previous',
+                    onPressed: () => _showAddCustomerDialog(usePrevious: true),
+                    child: const Icon(Icons.content_copy),
+                    tooltip: loc.translate('usePrevious'),
+                  ),
+                ],
+              ],
+            ),
+          );
+        },
       ),
     );
   }

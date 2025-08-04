@@ -72,35 +72,35 @@ class _DealershipDetailPageState extends State<DealershipDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppLocalizations.of(context)!.translate('edit_dealership'),
+            DealershipLocalizations.of(context)!.translate('edit_dealership'),
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _nameController,
             decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.translate('dealership_name'),
+              labelText: DealershipLocalizations.of(context)!.translate('dealership_name'),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _addressController,
             decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.translate('address'),
+              labelText: DealershipLocalizations.of(context)!.translate('address'),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _cityController,
             decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.translate('city'),
+              labelText: DealershipLocalizations.of(context)!.translate('city'),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _postalCodeController,
             decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.translate('postal_code'),
+              labelText: DealershipLocalizations.of(context)!.translate('postal_code'),
             ),
           ),
           const SizedBox(height: 32),
@@ -115,7 +115,7 @@ class _DealershipDetailPageState extends State<DealershipDetailPage> {
               );
               widget.onUpdate(updatedDealership);
             },
-            child: Text(AppLocalizations.of(context)!.translate('update')),
+            child: Text(DealershipLocalizations.of(context)!.translate('update')),
           ),
           const SizedBox(height: 16),
           ElevatedButton(
@@ -123,7 +123,7 @@ class _DealershipDetailPageState extends State<DealershipDetailPage> {
               widget.onDelete(widget.dealership);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(AppLocalizations.of(context)!.translate('delete')),
+            child: Text(DealershipLocalizations.of(context)!.translate('delete')),
           ),
         ],
       ),

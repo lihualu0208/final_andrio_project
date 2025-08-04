@@ -54,7 +54,9 @@
 
     
 <section class="desc markdown">
-  <p>the state for the Sales Page to be returned to SalesPage statefulWidget class create state method</p>
+  <p>The internal state class for <a href="../SalesPage_SalesPage/SalesPage-class.html">SalesPage</a>.</p>
+<p>Handles initialization of controllers, database, shared preferences,
+and builds the localized UI including a split layout for wide screens.</p>
 </section>
 
 
@@ -118,7 +120,7 @@
 
 </dt>
 <dd>
-  variable to hold the data access object for the database
+  DAO object from the SalesDatabase.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -154,7 +156,7 @@
 
 </dt>
 <dd>
-  List of SalesRecords objects to be used to display the list of records from the database
+  List of current sales records fetched from the database.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -178,7 +180,7 @@
 
 </dt>
 <dd>
-  a variable to hold a reference to the selected object from the list of records from the database
+  The currently selected record to view/edit.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -218,6 +220,19 @@ removed via <a href="https://api.flutter.dev/flutter/widgets/State/deactivate.ht
 
 </dd>
 
+        <dt id="addRecord" class="callable">
+  <span class="name"><a href="../SalesPage_SalesPage/SalesPageState/addRecord.html">addRecord</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Validates and adds a new sales record to the database and shared preferences.
+  
+
+</dd>
+
         <dt id="build" class="callable">
   <span class="name"><a href="../SalesPage_SalesPage/SalesPageState/build.html">build</a></span><span class="signature">(<wbr><span class="parameter" id="build-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
@@ -226,7 +241,7 @@ removed via <a href="https://api.flutter.dev/flutter/widgets/State/deactivate.ht
 
 </dt>
 <dd>
-  Describes the part of the user interface represented by this widget.
+  Builds the main SalesPage UI with localization and responsive layout.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -258,16 +273,14 @@ removed via <a href="https://api.flutter.dev/flutter/widgets/State/deactivate.ht
 </dd>
 
         <dt id="detailsPage" class="callable">
-  <span class="name"><a href="../SalesPage_SalesPage/SalesPageState/detailsPage.html">detailsPage</a></span><span class="signature">(<wbr>)
+  <span class="name"><a href="../SalesPage_SalesPage/SalesPageState/detailsPage.html">detailsPage</a></span><span class="signature">(<wbr><span class="parameter" id="detailsPage-param-loc"><span class="type-annotation"><a href="../SalesPage_AppLocalizations/AppLocalizations-class.html">AppLocalizations</a></span> <span class="parameter-name">loc</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
   </span>
   
 
 </dt>
 <dd>
-  detail pane of web page, to display attributes for currently selected
-SalesRecords object, as well as prompt the user with options to update
-or delete the viewed record of sale or any of its attributes (excepting ID)
+  Builds the details panel for the selected sales record.
   
 
 </dd>
@@ -306,7 +319,7 @@ or delete the viewed record of sale or any of its attributes (excepting ID)
 
 </dt>
 <dd>
-  Called when this object is removed from the tree permanently.
+  Disposes all text editing controllers to free resources.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -319,23 +332,21 @@ or delete the viewed record of sale or any of its attributes (excepting ID)
 
 </dt>
 <dd>
-  Called when this object is inserted into the tree.
+  Initializes controllers, loads sales records from the local database,
+and retrieves previously saved input values from encrypted shared preferences.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
 
         <dt id="listPage" class="callable">
-  <span class="name"><a href="../SalesPage_SalesPage/SalesPageState/listPage.html">listPage</a></span><span class="signature">(<wbr>)
+  <span class="name"><a href="../SalesPage_SalesPage/SalesPageState/listPage.html">listPage</a></span><span class="signature">(<wbr><span class="parameter" id="listPage-param-loc"><span class="type-annotation"><a href="../SalesPage_AppLocalizations/AppLocalizations-class.html">AppLocalizations</a></span> <span class="parameter-name">loc</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
   </span>
   
 
 </dt>
 <dd>
-  Widget to return the list portion of the page, containing input textFields
-for record fields an add button to add record to database and list, and
-the output of the list of returned SalesRecords objects for viewing and selection
-to display in detailsPage widget
+  Builds the list panel UI containing:
   
 
 </dd>
@@ -368,18 +379,14 @@ example during hot reload.
 </dd>
 
         <dt id="responsiveLayout" class="callable">
-  <span class="name"><a href="../SalesPage_SalesPage/SalesPageState/responsiveLayout.html">responsiveLayout</a></span><span class="signature">(<wbr>)
+  <span class="name"><a href="../SalesPage_SalesPage/SalesPageState/responsiveLayout.html">responsiveLayout</a></span><span class="signature">(<wbr><span class="parameter" id="responsiveLayout-param-loc"><span class="type-annotation"><a href="../SalesPage_AppLocalizations/AppLocalizations-class.html">AppLocalizations</a></span> <span class="parameter-name">loc</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
   </span>
   
 
 </dt>
 <dd>
-  widget to return a responsive layout based on window size, if Landscape
-returns view of the listPage and detailsPage widgets in a single pane,
-else if portrait dimensions, returns a changing layout where it displays
-the listPage until a record is selected, then returns detailsPage until
-record unselected
+  Builds the responsive layout for the Sales page.
   
 
 </dd>

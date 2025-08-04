@@ -55,20 +55,24 @@
     <section class="multi-line-signature">
       const
       <span class="name ">CustomerListPage</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
-<li><span class="parameter" id="-param-customerDao"><span>required</span> <span class="type-annotation"><a href="../../CustomerListPage_customer_dao/CustomerDao-class.html">CustomerDao</a></span> <span class="parameter-name">customerDao</span>, </span></li>
+<li><span class="parameter" id="-param-repository"><span>required</span> <span class="type-annotation"><a href="../../CustomerListPage_customer_repository/CustomerRepository-class.html">CustomerRepository</a></span> <span class="parameter-name">repository</span>, </span></li>
+<li><span class="parameter" id="-param-forcedLocale"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span> <span class="parameter-name">forcedLocale</span>, </span></li>
+<li><span class="parameter" id="-param-onLocaleChange"><span>required</span> <span class="type-annotation">void</span> <span class="parameter-name">onLocaleChange</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span></span></li>
+</ol>), </span></li>
 </ol>})
     </section>
     
-<section class="desc markdown">
-  <p>Creates a <a href="../../CustomerListPage_customer_list_page/CustomerListPage-class.html">CustomerListPage</a> with the given <code>customerDao</code>.</p>
-<p>The <code>customerDao</code> must not be null.</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const CustomerListPage({super.key, required this.customerDao});</code></pre>
+  <pre class="language-dart"><code class="language-dart">const CustomerListPage({
+  Key? key,
+  required this.repository,
+  required this.forcedLocale,
+  required this.onLocaleChange,
+}) : super(key: key);</code></pre>
 </section>
 
 

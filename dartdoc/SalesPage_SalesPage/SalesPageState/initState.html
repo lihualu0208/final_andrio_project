@@ -67,30 +67,9 @@
     </section>
     
 <section class="desc markdown">
-  <p>Called when this object is inserted into the tree.</p>
-<p>The framework will call this method exactly once for each <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a> object
-it creates.</p>
-<p>Override this method to perform initialization that depends on the
-location at which this object was inserted into the tree (i.e., <a href="https://api.flutter.dev/flutter/widgets/State/context.html">context</a>)
-or on the widget used to configure this object (i.e., <a href="https://api.flutter.dev/flutter/widgets/State/widget.html">widget</a>).</p>
-<p>If a <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a>'s <a href="../../SalesPage_SalesPage/SalesPageState/build.html">build</a> method depends on an object that can itself
-change state, for example a <a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier-class.html">ChangeNotifier</a> or <a href="https://api.flutter.dev/flutter/dart-core/Stream-class.html">Stream</a>, or some
-other object to which one can subscribe to receive notifications, then
-be sure to subscribe and unsubscribe properly in <a href="../../SalesPage_SalesPage/SalesPageState/initState.html">initState</a>,
-<a href="https://api.flutter.dev/flutter/widgets/State/didUpdateWidget.html">didUpdateWidget</a>, and <a href="../../SalesPage_SalesPage/SalesPageState/dispose.html">dispose</a>:</p>
-<ul>
-<li>In <a href="../../SalesPage_SalesPage/SalesPageState/initState.html">initState</a>, subscribe to the object.</li>
-<li>In <a href="https://api.flutter.dev/flutter/widgets/State/didUpdateWidget.html">didUpdateWidget</a> unsubscribe from the old object and subscribe
-to the new one if the updated widget configuration requires
-replacing the object.</li>
-<li>In <a href="../../SalesPage_SalesPage/SalesPageState/dispose.html">dispose</a>, unsubscribe from the object.</li>
-</ul>
-<p>You should not use <a href="https://api.flutter.dev/flutter/widgets/BuildContext/dependOnInheritedWidgetOfExactType.html">BuildContext.dependOnInheritedWidgetOfExactType</a> from this
-method. However, <a href="https://api.flutter.dev/flutter/widgets/State/didChangeDependencies.html">didChangeDependencies</a> will be called immediately
-following this method, and <a href="https://api.flutter.dev/flutter/widgets/BuildContext/dependOnInheritedWidgetOfExactType.html">BuildContext.dependOnInheritedWidgetOfExactType</a> can
-be used there.</p>
-<p>Implementations of this method should start with a call to the inherited
-method, as in <code>super.initState()</code>.</p>
+  <p>Initializes controllers, loads sales records from the local database,
+and retrieves previously saved input values from encrypted shared preferences.</p>
+<p>This method is called once when the <a href="../../SalesPage_SalesPage/SalesPageState-class.html">SalesPageState</a> is first created.</p>
 </section>
 
 
@@ -100,61 +79,48 @@ method, as in <code>super.initState()</code>.</p>
   <pre class="language-dart"><code class="language-dart">@override
 void initState() {
   super.initState();
-  &#47;&#47;listpage controllers
   _controller0 = TextEditingController();
   _controller1 = TextEditingController();
   _controller2 = TextEditingController();
   _controller3 = TextEditingController();
   _controller4 = TextEditingController();
-  &#47;&#47;display page controllers
+
   _displayCustID = TextEditingController();
   _displayTitle = TextEditingController();
   _displayCarID = TextEditingController();
   _displayDID = TextEditingController();
   _displayDate = TextEditingController();
 
-
-
-
   $FloorSalesDatabase.databaseBuilder(&#39;final_database.db&#39;)
-      .build().then( (database) async {
+      .build()
+      .then((database) async {
     daoObj = database.getDAO;
     var dbResults = await daoObj.getRecords();
     setState(() {
       records = dbResults;
     });
-
   });
 
   Future.delayed(Duration.zero, () async {
     EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
-    &#47;&#47;set strings to hold ESP&#39;s
     String prefsTitle = await prefs.getString(&quot;SalesPageTitle&quot;);
     String prefsCustId = await prefs.getString(&quot;SalesPageCustID&quot;);
     String prefsCarId = await prefs.getString(&quot;SalesPageCarID&quot;);
     String prefsDId = await prefs.getString(&quot;SalesPageDID&quot;);
     String prefsDate = await prefs.getString(&quot;SalesPageDate&quot;);
 
-    &#47;&#47;if statements to check all prefs have values
-    &#47;&#47;if NOT NULL, then
-    if (prefsTitle != &quot;&quot;) {
-      if (prefsCustId != &quot;&quot;) {
-        if (prefsCarId != &quot;&quot;){
-          if (prefsDId != &quot;&quot;){
-            if (prefsDate != &quot;&quot;){
-              setState(() {
-                &#47;&#47; set controllers text to EncrypSharPrefs
-                &#47;&#47;eg _controller1.text = username;
-                _controller0.text = prefsTitle;
-                _controller1.text = prefsCustId;
-                _controller2.text = prefsCarId;
-                _controller3.text = prefsDId;
-                _controller4.text = prefsDate;
-              });
-            }
-          }
-        }
-      }
+    if (prefsTitle != &quot;&quot; &amp;&amp;
+        prefsCustId != &quot;&quot; &amp;&amp;
+        prefsCarId != &quot;&quot; &amp;&amp;
+        prefsDId != &quot;&quot; &amp;&amp;
+        prefsDate != &quot;&quot;) {
+      setState(() {
+        _controller0.text = prefsTitle;
+        _controller1.text = prefsCustId;
+        _controller2.text = prefsCarId;
+        _controller3.text = prefsDId;
+        _controller4.text = prefsDate;
+      });
     }
   });
 }</code></pre>

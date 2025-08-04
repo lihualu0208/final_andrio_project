@@ -206,14 +206,83 @@ class _CarListPageState extends State<CarListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = Localizations.of<CarLocaleProvider>(context, CarLocaleProvider)!;
+    final loc = CarLocaleProvider.of(context);
     final isWide = MediaQuery.of(context).size.width > 600;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F6FA),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFDFDFE4),
+        title: Text(
+          loc.get('app_title') ?? 'Car Page',
+          style: const TextStyle(
+            fontSize: 22,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  backgroundColor: const Color(0xFFE4E7ED),
+                  title: Text(loc.get('instructions')),
+                  content: Text(
+                    '${loc.get('add_car')}${loc.get('with_images')}\n'
+                        '${loc.get('fill_all_fields')}\n${loc.get('tap_car')}',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  backgroundColor: const Color(0xFFE4E7ED),
+                  title: const Text("Language"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: const Text("English"),
+                        onTap: () {
+                          widget.onLocaleChange(const Locale('en'));
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: const Text("Tiếng Việt"),
+                        onTap: () {
+                          widget.onLocaleChange(const Locale('vi'));
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Row(
         children: [
-          // Left side - Car list
+          // Left panel
           Container(
             width: isWide ? 400 : MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(16),
@@ -223,67 +292,7 @@ class _CarListPageState extends State<CarListPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // App title and icons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          loc.get('app_title'),
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.help_outline),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    backgroundColor: const Color(0xFFE4E7ED),
-                                    title: Text(loc.get('instructions')),
-                                    content: Text('${loc.get('add_car')}${loc.get('with_images')}\n${loc.get('fill_all_fields')}\n${loc.get('tap_car')}'),
-                                    actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
-                                  ),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.language),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    backgroundColor: const Color(0xFFE4E7ED),
-                                    title: const Text("Language"),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        ListTile(
-                                          title: const Text("English"),
-                                          onTap: () {
-                                            widget.onLocaleChange(const Locale('en'));
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                        ListTile(
-                                          title: const Text("Tiếng Việt"),
-                                          onTap: () {
-                                            widget.onLocaleChange(const Locale('vi'));
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
                     const SizedBox(height: 16),
-                    // Car list
                     Expanded(
                       child: FutureBuilder<List<Car>>(
                         future: _carList,
@@ -322,9 +331,15 @@ class _CarListPageState extends State<CarListPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('${car.make} ${car.model}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                      Text(
+                                        '${car.make} ${car.model}',
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
                                       const SizedBox(height: 4),
-                                      Text('${car.year} - ${car.color}', style: const TextStyle(color: Colors.grey)),
+                                      Text(
+                                        '${car.year} - ${car.color}',
+                                        style: const TextStyle(color: Colors.grey),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -336,14 +351,14 @@ class _CarListPageState extends State<CarListPage> {
                     ),
                   ],
                 ),
-                // Floating Action Buttons (Add & Use Previous)
                 Positioned(
-                  bottom: 0,
+                  bottom: 24,
                   left: 0,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  right: 0,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      FloatingActionButton(
+                      FloatingActionButton.small(
                         heroTag: 'add_car',
                         onPressed: () => _showAddDialog(loc),
                         backgroundColor: const Color(0xFFD8E7FF),
@@ -352,8 +367,8 @@ class _CarListPageState extends State<CarListPage> {
                         child: const Icon(Icons.add),
                         tooltip: loc.get('add_car'),
                       ),
-                      const SizedBox(height: 10),
-                      FloatingActionButton(
+                      const SizedBox(width: 7),
+                      FloatingActionButton.small(
                         heroTag: 'use_previous',
                         onPressed: () => _showAddDialog(loc, usePrevious: true),
                         backgroundColor: const Color(0xFFD8E7FF),
@@ -368,13 +383,19 @@ class _CarListPageState extends State<CarListPage> {
               ],
             ),
           ),
-          // Right side - Car details
+
+          // Right panel
           if (isWide)
             Expanded(
               child: Container(
                 color: const Color(0xFFE4E7ED),
                 child: _selectedCar == null
-                    ? Center(child: Text(loc.get('select_car'), style: const TextStyle(color: Colors.black54)))
+                    ? Center(
+                  child: Text(
+                    loc.get('select_car'),
+                    style: const TextStyle(color: Colors.black54),
+                  ),
+                )
                     : Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(

@@ -7,6 +7,10 @@ import 'customer_list_page.dart';
 import 'customr_AppLocalizations.dart';
 import 'customer_locale_provider.dart';
 
+/// The main entry point of the Customer app.
+///
+/// Initializes the database and locale preferences,
+/// then runs the [MyApp] widget wrapped with [ChangeNotifierProvider].
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -28,6 +32,10 @@ void main() async {
   );
 }
 
+/// Root widget of the Customer Management app.
+///
+/// Builds a [MaterialApp] with localization and theme settings,
+/// and injects the customer list screen as the home widget.
 class MyApp extends StatelessWidget {
   final CustomerDao customerDao;
 
@@ -59,6 +67,10 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// Initializes and returns the [MyApp] widget with providers and database.
+///
+/// This function is useful for modular apps or when this module is integrated
+/// into a larger Flutter project.
 Future<Widget> initializeCustomerApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   final database = await $FloorAppDatabase

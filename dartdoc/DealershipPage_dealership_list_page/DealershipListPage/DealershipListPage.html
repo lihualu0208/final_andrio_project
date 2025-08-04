@@ -56,10 +56,9 @@
       const
       <span class="name ">DealershipListPage</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
 <li><span class="parameter" id="-param-dealershipDao"><span>required</span> <span class="type-annotation"><a href="../../DealershipPage_dealership_dao/DealershipDao-class.html">DealershipDao</a></span> <span class="parameter-name">dealershipDao</span>, </span></li>
-<li><span class="parameter" id="-param-isMaster"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isMaster</span> = <span class="default-value">false</span>, </span></li>
-<li><span class="parameter" id="-param-onDealershipSelected"><span class="type-annotation">dynamic</span> <span class="parameter-name">onDealershipSelected</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-"><span class="type-annotation"><a href="../../DealershipPage_car_dealership/Dealership-class.html">Dealership</a></span></span></li>
-</ol>)?, </span></li>
-<li><span class="parameter" id="-param-selectedDealership"><span class="type-annotation"><a href="../../DealershipPage_car_dealership/Dealership-class.html">Dealership</a>?</span> <span class="parameter-name">selectedDealership</span>, </span></li>
+<li><span class="parameter" id="-param-forcedLocale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a>?</span> <span class="parameter-name">forcedLocale</span>, </span></li>
+<li><span class="parameter" id="-param-onLocaleChange"><span>required</span> <span class="type-annotation">void</span> <span class="parameter-name">onLocaleChange</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span></span></li>
+</ol>), </span></li>
 </ol>})
     </section>
     
@@ -71,9 +70,8 @@
   <pre class="language-dart"><code class="language-dart">const DealershipListPage({
   super.key,
   required this.dealershipDao,
-  this.isMaster = false,
-  this.onDealershipSelected,
-  this.selectedDealership,
+  this.forcedLocale,
+  required this.onLocaleChange,
 });</code></pre>
 </section>
 

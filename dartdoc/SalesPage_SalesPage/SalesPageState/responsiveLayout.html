@@ -55,48 +55,38 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
-<span class="name ">responsiveLayout</span>(<wbr>)
+<span class="name ">responsiveLayout</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="responsiveLayout-param-loc"><span class="type-annotation"><a href="../../SalesPage_AppLocalizations/AppLocalizations-class.html">AppLocalizations</a></span> <span class="parameter-name">loc</span></span></li>
+</ol>)
 
       
 
     </section>
     
 <section class="desc markdown">
-  <p>widget to return a responsive layout based on window size, if Landscape
-returns view of the listPage and detailsPage widgets in a single pane,
-else if portrait dimensions, returns a changing layout where it displays
-the listPage until a record is selected, then returns detailsPage until
-record unselected</p>
+  <p>Builds the responsive layout for the Sales page.</p>
+<ul>
+<li>On large screens: displays both the list and details side-by-side.</li>
+<li>On small screens: shows either the list or the selected item details.</li>
+</ul>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Widget responsiveLayout(){
+  <pre class="language-dart"><code class="language-dart">Widget responsiveLayout(AppLocalizations loc) {
   var size = MediaQuery.of(context).size;
-  var height = size.height;
-  var width = size.width;
-
-  if (width&gt;height &amp;&amp; width &gt; 720.00){
-    return Row(children: [
-      Expanded(
-          flex: 3,
-          child: listPage()
-      ),
-
-      Expanded(
-          flex: 2,
-          child: detailsPage())
-      ,
-
-    ],);
+  if (size.width &gt; size.height &amp;&amp; size.width &gt; 720.0) {
+    return Row(
+      children: [
+        Expanded(flex: 3, child: listPage(loc)),
+        Expanded(flex: 2, child: detailsPage(loc)),
+      ],
+    );
   } else {
-    if(selectedItem==null){
-      return listPage();
-    } else {
-      return detailsPage();
-    }
+    return selectedItem == null
+        ? listPage(loc)
+        : detailsPage(loc);
   }
 }</code></pre>
 </section>

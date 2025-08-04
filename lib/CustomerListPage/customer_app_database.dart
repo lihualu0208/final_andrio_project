@@ -11,10 +11,10 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'customer_dao.dart';
 import 'customer.dart';
 
-part 'custmomer_app_database.g.dart';
+part 'customer_app_database.g.dart';
 
 @Database(version: 1, entities: [Customer])
-abstract class AppDatabase extends FloorDatabase {
+abstract class CustomerAppDatabase extends FloorDatabase {
   /// Provides access to the Customer Data Access Object (DAO).
   CustomerDao get customerDao;
 }

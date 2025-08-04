@@ -53,6 +53,11 @@
 </h1></div>
 
     
+<section class="desc markdown">
+  <p>A page that displays and manages a list of car dealerships.</p>
+<p>Includes add/edit/delete functionality, localization support,
+and a split-view layout for large screens.</p>
+</section>
 
 
     <section>
@@ -85,7 +90,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="DealershipListPage.new" class="callable">
-          <span class="name"><a href="../DealershipPage_dealership_list_page/DealershipListPage/DealershipListPage.html">DealershipListPage.new</a></span><span class="signature">({<span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="-param-dealershipDao"><span>required</span> <span class="type-annotation"><a href="../DealershipPage_dealership_dao/DealershipDao-class.html">DealershipDao</a></span> <span class="parameter-name">dealershipDao</span>, </span><span class="parameter" id="-param-isMaster"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isMaster</span> = <span class="default-value">false</span>, </span><span class="parameter" id="-param-onDealershipSelected"><span class="type-annotation">dynamic</span> <span class="parameter-name">onDealershipSelected</span>(<span class="parameter" id="param-"><span class="type-annotation"><a href="../DealershipPage_car_dealership/Dealership-class.html">Dealership</a></span></span>)?, </span><span class="parameter" id="-param-selectedDealership"><span class="type-annotation"><a href="../DealershipPage_car_dealership/Dealership-class.html">Dealership</a>?</span> <span class="parameter-name">selectedDealership</span></span>})</span>
+          <span class="name"><a href="../DealershipPage_dealership_list_page/DealershipListPage/DealershipListPage.html">DealershipListPage.new</a></span><span class="signature">({<span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="-param-dealershipDao"><span>required</span> <span class="type-annotation"><a href="../DealershipPage_dealership_dao/DealershipDao-class.html">DealershipDao</a></span> <span class="parameter-name">dealershipDao</span>, </span><span class="parameter" id="-param-forcedLocale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a>?</span> <span class="parameter-name">forcedLocale</span>, </span><span class="parameter" id="-param-onLocaleChange"><span>required</span> <span class="type-annotation">void</span> <span class="parameter-name">onLocaleChange</span>(<span class="parameter" id="param-"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span></span>)</span>})</span>
         </dt>
         <dd>
           
@@ -106,7 +111,19 @@
 
 </dt>
 <dd>
+  The DAO for performing database operations on dealerships.
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="forcedLocale" class="property">
+  <span class="name"><a href="../DealershipPage_dealership_list_page/DealershipListPage/forcedLocale.html">forcedLocale</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a>?</span>
   
+
+</dt>
+<dd>
+  The locale to override localization with.
   <div class="features"><span class="feature">final</span></div>
 
 </dd>
@@ -123,18 +140,6 @@
 
 </dd>
 
-        <dt id="isMaster" class="property">
-  <span class="name"><a href="../DealershipPage_dealership_list_page/DealershipListPage/isMaster.html">isMaster</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">final</span></div>
-
-</dd>
-
         <dt id="key" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/widgets/Widget/key.html">key</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span>
@@ -147,14 +152,14 @@
 
 </dd>
 
-        <dt id="onDealershipSelected" class="property">
-  <span class="name"><a href="../DealershipPage_dealership_list_page/DealershipListPage/onDealershipSelected.html">onDealershipSelected</a></span>
-  <span class="signature">&#8594; dynamic Function<span class="signature">(<span class="parameter" id="param-"><span class="type-annotation"><a href="../DealershipPage_car_dealership/Dealership-class.html">Dealership</a></span></span>)</span>?</span>
+        <dt id="onLocaleChange" class="property">
+  <span class="name"><a href="../DealershipPage_dealership_list_page/DealershipListPage/onLocaleChange.html">onLocaleChange</a></span>
+  <span class="signature">&#8594; void Function<span class="signature">(<span class="parameter" id="param-"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Locale-class.html">Locale</a></span></span>)</span></span>
   
 
 </dt>
 <dd>
-  
+  Callback to notify the app of a locale change.
   <div class="features"><span class="feature">final</span></div>
 
 </dd>
@@ -168,18 +173,6 @@
 <dd class="inherited">
   A representation of the runtime type of the object.
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
-
-</dd>
-
-        <dt id="selectedDealership" class="property">
-  <span class="name"><a href="../DealershipPage_dealership_list_page/DealershipListPage/selectedDealership.html">selectedDealership</a></span>
-  <span class="signature">&#8594; <a href="../DealershipPage_car_dealership/Dealership-class.html">Dealership</a>?</span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 

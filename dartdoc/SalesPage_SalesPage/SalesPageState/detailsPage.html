@@ -55,151 +55,107 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
-<span class="name ">detailsPage</span>(<wbr>)
+<span class="name ">detailsPage</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="detailsPage-param-loc"><span class="type-annotation"><a href="../../SalesPage_AppLocalizations/AppLocalizations-class.html">AppLocalizations</a></span> <span class="parameter-name">loc</span></span></li>
+</ol>)
 
       
 
     </section>
     
 <section class="desc markdown">
-  <p>detail pane of web page, to display attributes for currently selected
-SalesRecords object, as well as prompt the user with options to update
-or delete the viewed record of sale or any of its attributes (excepting ID)</p>
+  <p>Builds the details panel for the selected sales record.</p>
+<p>Allows editing the selected record using text fields, and provides
+buttons to delete, update, or close the detail view.</p>
+<p>If no item is selected, an empty widget is returned.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Widget detailsPage(){
-  if(selectedItem != null){
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children:[
-        Text(&quot;${AppLocalizations.of(context)!.translate(&#39;CurrTitle&#39;)} ${selectedItem?.title}&quot;),
-        Text(&quot;${AppLocalizations.of(context)!.translate(&#39;CurrCustID&#39;)} ${selectedItem?.custID}&quot;),
-        Text(&quot;${AppLocalizations.of(context)!.translate(&#39;CurrCarID&#39;)} ${selectedItem?.carID}&quot;),
-        Text(&quot;${AppLocalizations.of(context)!.translate(&#39;CurrDID&#39;)} ${selectedItem?.dealerID}&quot;),
-        Text(&quot;${AppLocalizations.of(context)!.translate(&#39;CurrDate&#39;)} ${selectedItem?.date}\n\n&quot;),
+  <pre class="language-dart"><code class="language-dart">Widget detailsPage(AppLocalizations loc) {
+  if (selectedItem == null) return const SizedBox();
 
-        TextField(
-          controller: _displayTitle,
-          decoration: InputDecoration(
-              hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;UpdTitle&#39;)}&quot;,
-              border: OutlineInputBorder()
-          ),
-        ),
-        TextField(
-          controller: _displayCustID,
-          decoration: InputDecoration(
-              hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;UpdCustID&#39;)}&quot;,
-              border: OutlineInputBorder()
-          ),
-        ),
-        TextField(
-          controller: _displayCarID,
-          decoration: InputDecoration(
-              hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;UpdCarID&#39;)}&quot;,
-              border: OutlineInputBorder()
-          ),
-        ),
-        TextField(
-          controller: _displayDID,
-          decoration: InputDecoration(
-              hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;UpdDID&#39;)}&quot;,
-              border: OutlineInputBorder()
-          ),
-        ),
-        TextField(
-          controller: _displayDate,
-          decoration: InputDecoration(
-              hintText: &quot;${AppLocalizations.of(context)!.translate(&#39;UpdDate&#39;)}&quot;,
-              border: OutlineInputBorder()
-          ),
-        ),
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(&quot;${loc.translate(&#39;CurrTitle&#39;)} ${selectedItem?.title}&quot;),
+      Text(&quot;${loc.translate(&#39;CurrCustID&#39;)} ${selectedItem?.custID}&quot;),
+      Text(&quot;${loc.translate(&#39;CurrCarID&#39;)} ${selectedItem?.carID}&quot;),
+      Text(&quot;${loc.translate(&#39;CurrDID&#39;)} ${selectedItem?.dealerID}&quot;),
+      Text(&quot;${loc.translate(&#39;CurrDate&#39;)} ${selectedItem?.date}\n\n&quot;),
+      TextField(
+        controller: _displayTitle,
+        decoration: InputDecoration(hintText: loc.translate(&#39;UpdTitle&#39;)),
+      ),
+      TextField(
+        controller: _displayCustID,
+        decoration: InputDecoration(hintText: loc.translate(&#39;UpdCustID&#39;)),
+      ),
+      TextField(
+        controller: _displayCarID,
+        decoration: InputDecoration(hintText: loc.translate(&#39;UpdCarID&#39;)),
+      ),
+      TextField(
+        controller: _displayDID,
+        decoration: InputDecoration(hintText: loc.translate(&#39;UpdDID&#39;)),
+      ),
+      TextField(
+        controller: _displayDate,
+        decoration: InputDecoration(hintText: loc.translate(&#39;UpdDate&#39;)),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          setState(() {
+            daoObj.removeSalesRecord(selectedItem);
+            records.remove(selectedItem);
+            selectedItem = null;
+            _displayTitle.clear();
+            _displayCustID.clear();
+            _displayCarID.clear();
+            _displayDID.clear();
+            _displayDate.clear();
+          });
+        },
+        child: Text(loc.translate(&#39;DelBtn&#39;) ?? &quot;Delete&quot;),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          setState(() {
+            if (_displayTitle.text.isNotEmpty) {
+              selectedItem?.title = _displayTitle.text;
+            }
+            if (_displayCustID.text.isNotEmpty) {
+              selectedItem?.custID = int.parse(_displayCustID.text);
+            }
+            if (_displayCarID.text.isNotEmpty) {
+              selectedItem?.carID = int.parse(_displayCarID.text);
+            }
+            if (_displayDID.text.isNotEmpty) {
+              selectedItem?.dealerID = int.parse(_displayDID.text);
+            }
+            if (_displayDate.text.isNotEmpty) {
+              selectedItem?.date = _displayDate.text;
+            }
 
+            daoObj.updateSalesRecord(selectedItem);
 
-
-        &#47;&#47;button to delete an record from list
-        ElevatedButton(
-            onPressed: (){
-              setState(() {
-                daoObj.removeSalesRecord(selectedItem);
-                records.remove(selectedItem);
-                selectedItem = null;
-                _displayTitle.text = &quot;&quot;;
-                _displayCustID.text = &quot;&quot;;
-                _displayCarID.text = &quot;&quot;;
-                _displayDID.text = &quot;&quot;;
-                _displayDate.text = &quot;&quot;;
-              });
-
-            },
-            child: Text(&quot;${AppLocalizations.of(context)!.translate(&#39;DelBtn&#39;)}&quot;)
-        ),
-
-        &#47;&#47;button to update a record from list
-        ElevatedButton(
-            onPressed: (){
-              setState(() {
-                &#47;&#47;&#47;var to hold title from updated title textField
-                String newTitle = _displayTitle.value.text;
-                &#47;&#47;&#47;var to hold potentially updated customer ID from updated customer ID textField
-                String newCustID = _displayCustID.value.text;
-                &#47;&#47;&#47;var to hold potentially updated car ID from updated car ID textField
-                String newCarID = _displayCarID.value.text;
-                &#47;&#47;&#47;var to hold potentially updated Dealer ID from updated Dealer ID textField
-                String newDID = _displayDID.value.text;
-                &#47;&#47;&#47;var to hold potentially updated date from updated date textField
-                String newDate = _displayDate.value.text;
-
-                if (_displayTitle.text != &quot;&quot;) {
-                  selectedItem?.title = newTitle;
-                }
-                if (_displayCustID.text != &quot;&quot;) {
-                  selectedItem?.custID = int.parse(newCustID);
-                }
-                if (_displayCarID.text != &quot;&quot;) {
-                  selectedItem?.carID = int.parse(newCarID);
-                }
-                if (_displayDID.text != &quot;&quot;) {
-                  selectedItem?.dealerID = int.parse(newDID);
-                }
-                if (_displayDate.text != &quot;&quot;) {
-                  selectedItem?.date = newDate;
-                }
-
-                daoObj.updateSalesRecord(selectedItem);
-
-                selectedItem = null;
-                _displayTitle.text = &quot;&quot;;
-                _displayCustID.text = &quot;&quot;;
-                _displayCarID.text = &quot;&quot;;
-                _displayDID.text = &quot;&quot;;
-                _displayDate.text = &quot;&quot;;
-              });
-
-            },
-            child: Text(&quot;${AppLocalizations.of(context)!.translate(&#39;UpdBtn&#39;)}&quot;)
-        ),
-        ElevatedButton(
-            onPressed: (){
-              setState(() {
-                selectedItem = null;
-              });
-
-            },
-            child: Text(&quot;${AppLocalizations.of(context)!.translate(&#39;Close&#39;)}&quot;)
-        ),
-      ],);
-  } else {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(&quot;&quot;),
-        ]
-    );
-  }
+            selectedItem = null;
+            _displayTitle.clear();
+            _displayCustID.clear();
+            _displayCarID.clear();
+            _displayDID.clear();
+            _displayDate.clear();
+          });
+        },
+        child: Text(loc.translate(&#39;UpdBtn&#39;) ?? &quot;Update&quot;),
+      ),
+      ElevatedButton(
+        onPressed: () =&gt; setState(() =&gt; selectedItem = null),
+        child: Text(loc.translate(&#39;Close&#39;) ?? &quot;Close&quot;),
+      ),
+    ],
+  );
 }</code></pre>
 </section>
 

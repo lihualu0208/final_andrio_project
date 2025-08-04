@@ -67,56 +67,9 @@
     </section>
     
 <section class="desc markdown">
-  <p>Called when this object is removed from the tree permanently.</p>
-<p>The framework calls this method when this <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a> object will never
-build again. After the framework calls <a href="../../SalesPage_SalesPage/SalesPageState/dispose.html">dispose</a>, the <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a> object is
-considered unmounted and the <a href="https://api.flutter.dev/flutter/widgets/State/mounted.html">mounted</a> property is false. It is an error
-to call <a href="https://api.flutter.dev/flutter/widgets/State/setState.html">setState</a> at this point. This stage of the lifecycle is terminal:
-there is no way to remount a <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a> object that has been disposed.</p>
-<p>Subclasses should override this method to release any resources retained
-by this object (e.g., stop any active animations).</p>
-<p>If a <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a>'s <a href="../../SalesPage_SalesPage/SalesPageState/build.html">build</a> method depends on an object that can itself
-change state, for example a <a href="https://api.flutter.dev/flutter/foundation/ChangeNotifier-class.html">ChangeNotifier</a> or <a href="https://api.flutter.dev/flutter/dart-core/Stream-class.html">Stream</a>, or some
-other object to which one can subscribe to receive notifications, then
-be sure to subscribe and unsubscribe properly in <a href="../../SalesPage_SalesPage/SalesPageState/initState.html">initState</a>,
-<a href="https://api.flutter.dev/flutter/widgets/State/didUpdateWidget.html">didUpdateWidget</a>, and <a href="../../SalesPage_SalesPage/SalesPageState/dispose.html">dispose</a>:</p>
-<ul>
-<li>In <a href="../../SalesPage_SalesPage/SalesPageState/initState.html">initState</a>, subscribe to the object.</li>
-<li>In <a href="https://api.flutter.dev/flutter/widgets/State/didUpdateWidget.html">didUpdateWidget</a> unsubscribe from the old object and subscribe
-to the new one if the updated widget configuration requires
-replacing the object.</li>
-<li>In <a href="../../SalesPage_SalesPage/SalesPageState/dispose.html">dispose</a>, unsubscribe from the object.</li>
-</ul>
-<p>Implementations of this method should end with a call to the inherited
-method, as in <code>super.dispose()</code>.</p>
-<h2 id="caveats">Caveats</h2>
-<p>This method is <em>not</em> invoked at times where a developer might otherwise
-expect it, such as application shutdown or dismissal via platform
-native methods.</p>
-<h3 id="application-shutdown">Application shutdown</h3>
-<p>There is no way to predict when application shutdown will happen. For
-example, a user's battery could catch fire, or the user could drop the
-device into a swimming pool, or the operating system could unilaterally
-terminate the application process due to memory pressure.</p>
-<p>Applications are responsible for ensuring that they are well-behaved
-even in the face of a rapid unscheduled termination.</p>
-<p>To artificially cause the entire widget tree to be disposed, consider
-calling <a href="https://api.flutter.dev/flutter/widgets/runApp.html">runApp</a> with a widget such as <a href="https://api.flutter.dev/flutter/widgets/SizedBox/SizedBox.shrink.html">SizedBox.shrink</a>.</p>
-<p>To listen for platform shutdown messages (and other lifecycle changes),
-consider the <a href="https://api.flutter.dev/flutter/widgets/AppLifecycleListener-class.html">AppLifecycleListener</a> API.</p>
-<h2 id="dismissing-flutter-ui-via-platform-native-methods">Dismissing Flutter UI via platform native methods</h2>
-<p>An application may have both Flutter and non-Flutter UI in it. If the
-application calls non-Flutter methods to remove Flutter based UI such as
-platform native API to manipulate the platform native navigation stack,
-the framework does not know if the developer intends to eagerly free
-resources or not. The widget tree remains mounted and ready to render
-as soon as it is displayed again.</p>
-<p>See the method used to bootstrap the app (e.g. <a href="https://api.flutter.dev/flutter/widgets/runApp.html">runApp</a> or <a href="https://api.flutter.dev/flutter/widgets/runWidget.html">runWidget</a>)
-for suggestions on how to release resources more eagerly.</p>
-<p>See also:</p>
-<ul>
-<li><a href="https://api.flutter.dev/flutter/widgets/State/deactivate.html">deactivate</a>, which is called prior to <a href="../../SalesPage_SalesPage/SalesPageState/dispose.html">dispose</a>.</li>
-</ul>
+  <p>Disposes all text editing controllers to free resources.</p>
+<p>This method is called when the <a href="../../SalesPage_SalesPage/SalesPageState-class.html">SalesPageState</a> is permanently removed
+from the widget tree.</p>
 </section>
 
 
@@ -125,13 +78,12 @@ for suggestions on how to release resources more eagerly.</p>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 void dispose() {
-  &#47;&#47;listpage controllers
   _controller0.dispose();
   _controller1.dispose();
   _controller2.dispose();
   _controller3.dispose();
   _controller4.dispose();
-  &#47;&#47;displayPage controllers
+
   _displayTitle.dispose();
   _displayCustID.dispose();
   _displayCarID.dispose();

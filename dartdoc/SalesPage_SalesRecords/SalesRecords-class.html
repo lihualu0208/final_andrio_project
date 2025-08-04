@@ -53,6 +53,14 @@
 </h1></div>
 
     
+<section class="desc markdown">
+  <p>Represents a single sales record in the database.
+This entity stores the essential information about a sale,
+including customer ID, car ID, dealer ID, sale date, and a title/label.</p>
+<p>The <a href="../SalesPage_SalesRecords/SalesRecords/recordID.html">recordID</a> is the primary key, and <a href="../SalesPage_SalesRecords/SalesRecords/ID.html">ID</a> is used to auto-increment
+future records at runtime.
+This class is used with the Floor persistence library.</p>
+</section>
 
 
     <section>
@@ -84,7 +92,8 @@
           <span class="name"><a href="../SalesPage_SalesRecords/SalesRecords/SalesRecords.html">SalesRecords.new</a></span><span class="signature">(<span class="parameter" id="-param-recordID"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">recordID</span>, </span><span class="parameter" id="-param-title"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">title</span>, </span><span class="parameter" id="-param-custID"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">custID</span>, </span><span class="parameter" id="-param-carID"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">carID</span>, </span><span class="parameter" id="-param-dealerID"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">dealerID</span>, </span><span class="parameter" id="-param-date"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">date</span></span>)</span>
         </dt>
         <dd>
-          
+          Constructs a <a href="../SalesPage_SalesRecords/SalesRecords-class.html">SalesRecords</a> object and updates the static <a href="../SalesPage_SalesRecords/SalesRecords/ID.html">ID</a>
+if this record's ID is higher than the current value.
         </dd>
     </dl>
   </section>
@@ -101,7 +110,7 @@
 
 </dt>
 <dd>
-  
+  ID of the car being sold.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -113,7 +122,7 @@
 
 </dt>
 <dd>
-  
+  ID of the customer involved in the sale.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -125,7 +134,7 @@
 
 </dt>
 <dd>
-  
+  Date of the sale (formatted as a string).
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -137,7 +146,7 @@
 
 </dt>
 <dd>
-  
+  ID of the dealership handling the sale.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -161,7 +170,7 @@
 
 </dt>
 <dd>
-  
+  Primary key of the sales record.
   <div class="features"><span class="feature">final</span></div>
 
 </dd>
@@ -185,7 +194,7 @@
 
 </dt>
 <dd>
-  
+  Title or description of the sale.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>
@@ -259,7 +268,7 @@
 
 </dt>
 <dd>
-  
+  Global static auto-incrementing ID used for inserting new records manually.
   <div class="features"><span class="feature">getter/setter pair</span></div>
 
 </dd>

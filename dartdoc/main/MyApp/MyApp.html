@@ -55,6 +55,9 @@
     <section class="multi-line-signature">
       const
       <span class="name ">MyApp</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
+<li><span class="parameter" id="-param-carRepository"><span>required</span> <span class="type-annotation"><a href="../../CarListPage_car_repository/CarRepository-class.html">CarRepository</a></span> <span class="parameter-name">carRepository</span>, </span></li>
+<li><span class="parameter" id="-param-dealershipDao"><span>required</span> <span class="type-annotation"><a href="../../DealershipPage_dealership_dao/DealershipDao-class.html">DealershipDao</a></span> <span class="parameter-name">dealershipDao</span>, </span></li>
+<li><span class="parameter" id="-param-customerRepository"><span>required</span> <span class="type-annotation"><a href="../../CustomerListPage_customer_repository/CustomerRepository-class.html">CustomerRepository</a></span> <span class="parameter-name">customerRepository</span>, </span></li>
 </ol>})
     </section>
     
@@ -63,7 +66,12 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const MyApp({super.key});</code></pre>
+  <pre class="language-dart"><code class="language-dart">const MyApp({
+  super.key,
+  required this.carRepository,
+  required this.dealershipDao,
+  required this.customerRepository,
+});</code></pre>
 </section>
 
 
