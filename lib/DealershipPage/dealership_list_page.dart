@@ -8,16 +8,22 @@ import 'dealership_detail_page.dart';
 
 /// A page that displays and manages a list of car dealerships.
 ///
-/// Includes add/edit/delete functionality, localization support,
-/// and a split-view layout for large screens.
+/// This widget provides:
+/// - Add/edit/delete functionality for dealerships
+/// - Localization support
+/// - Responsive layout (list view on narrow screens, split view on wide screens)
+/// - Language switching capability
 class DealershipListPage extends StatefulWidget {
-  /// The DAO for performing database operations on dealerships.
+  /// Data Access Object for dealership database operations
   final DealershipDao dealershipDao;
-  /// The locale to override localization with.
+
+  /// Locale to override the app's current locale
   final Locale? forcedLocale;
-  /// Callback to notify the app of a locale change.
+
+  /// Callback to notify parent when locale changes
   final void Function(Locale) onLocaleChange;
 
+  /// Creates a dealership list page with required DAO and callbacks
   const DealershipListPage({
     super.key,
     required this.dealershipDao,
@@ -29,11 +35,21 @@ class DealershipListPage extends StatefulWidget {
   State<DealershipListPage> createState() => _DealershipListPageState();
 }
 
+/// State class for [DealershipListPage] that manages dealership data and UI
 class _DealershipListPageState extends State<DealershipListPage> {
+  /// Repository for managing dealership data persistence
   final DealershipRepository _dealershipRepo = DealershipRepository();
+
+  /// List of dealerships loaded from database
   final List<Dealership> _dealerships = [];
+
+  /// Currently selected dealership in the list
   Dealership? _selected;
+
+  /// Current locale for localization
   Locale? _currentLocale;
+
+  /// Flag indicating if last dealership data exists in repository
   bool _hasLastDealership = false;
 
   @override
@@ -44,7 +60,9 @@ class _DealershipListPageState extends State<DealershipListPage> {
     _checkLastDealership();
   }
 
-  /// Loads all dealerships from the database and sets the current max ID.
+  /// Loads all dealerships from database and updates the UI
+  ///
+  /// Also retrieves the maximum ID to set [Dealership.currentId] for new entries
   Future<void> loadDealerships() async {
     setState(() {
       _dealerships.clear();
@@ -59,7 +77,7 @@ class _DealershipListPageState extends State<DealershipListPage> {
     });
   }
 
-  /// Checks whether previous dealership data is saved in storage.
+  /// Checks if there's saved dealership data from previous operations
   Future<void> _checkLastDealership() async {
     await _dealershipRepo.loadData();
     setState(() {
@@ -67,8 +85,10 @@ class _DealershipListPageState extends State<DealershipListPage> {
     });
   }
 
-  /// Opens a dialog to add a new dealership, optionally using the last saved data.
-  void _onAddDealership({bool useLast = false}) {
+  /// Shows a dialog for adding a new dealership
+  ///
+  /// [useLast] - If true, pre-fills the form with last saved dealership data
+  void _showAddDealershipDialog({bool useLast = false}) {
     final name = useLast ? _dealershipRepo.name : '';
     final address = useLast ? _dealershipRepo.address : '';
     final city = useLast ? _dealershipRepo.city : '';
@@ -135,12 +155,26 @@ class _DealershipListPageState extends State<DealershipListPage> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
+                      final name = controllerName.text.trim();
+                      final address = controllerAddress.text.trim();
+                      final city = controllerCity.text.trim();
+                      final postal = controllerPostal.text.trim();
+
+                      if (name.isEmpty || address.isEmpty || city.isEmpty || postal.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text(dialogLoc.translate('all_fields_required') ?? 'All fields are required'),
+                          ),
+                        );
+                        return;
+                      }
+
                       final newDealership = Dealership(
                         id: Dealership.currentId++,
-                        name: controllerName.text.trim(),
-                        address: controllerAddress.text.trim(),
-                        city: controllerCity.text.trim(),
-                        postalCode: controllerPostal.text.trim(),
+                        name: name,
+                        address: address,
+                        city: city,
+                        postalCode: postal,
                       );
 
                       await widget.dealershipDao.insertDealership(newDealership);
@@ -166,7 +200,7 @@ class _DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
-  /// Displays a help dialog with usage instructions.
+  /// Shows a help dialog with app instructions
   void _showHelpDialog() {
     showDialog(
       context: context,
@@ -201,7 +235,7 @@ class _DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
-  /// Displays a dialog for selecting the app language.
+  /// Shows a language selection dialog
   void _showLanguageDialog() {
     showDialog(
       context: context,
@@ -254,7 +288,6 @@ class _DealershipListPageState extends State<DealershipListPage> {
     );
   }
 
-  /// Builds the UI of the dealership list page, including localization.
   @override
   Widget build(BuildContext context) {
     final locale = _currentLocale ?? widget.forcedLocale ?? Localizations.localeOf(context);
@@ -271,28 +304,33 @@ class _DealershipListPageState extends State<DealershipListPage> {
         final loc = DealershipLocalizations.of(context)!;
 
         return Scaffold(
-            appBar: AppBar(
-              backgroundColor: const Color(0xFFDFDFE4),
-              title: Text(
-                loc.translate('dealership_management') ?? 'Dealership Management',
-                style: const TextStyle(
-                  fontSize: 22,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFFDFDFE4),
+            title: Text(
+              loc.translate('dealership_management') ?? 'Dealership Management',
+              style: const TextStyle(
+                fontSize: 22,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
-              ),
-              actions: [
-                IconButton(icon: const Icon(Icons.help), onPressed: _showHelpDialog),
-                IconButton(icon: const Icon(Icons.language), onPressed: _showLanguageDialog),
-              ],
             ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.help),
+                onPressed: _showHelpDialog,
+              ),
+              IconButton(
+                icon: const Icon(Icons.language),
+                onPressed: _showLanguageDialog,
+              ),
+            ],
+          ),
           body: Row(
             children: [
-              // Left panel
               Container(
                 width: 400,
                 color: const Color(0xFFF3F6FA),
@@ -332,7 +370,7 @@ class _DealershipListPageState extends State<DealershipListPage> {
                       children: [
                         FloatingActionButton.small(
                           backgroundColor: const Color(0xFFD8E7FF),
-                          onPressed: _onAddDealership,
+                          onPressed: _showAddDealershipDialog,
                           tooltip: loc.translate('add_dealership') ?? 'Add Dealership',
                           foregroundColor: Colors.black,
                           child: const Icon(Icons.add),
@@ -342,7 +380,7 @@ class _DealershipListPageState extends State<DealershipListPage> {
                           FloatingActionButton.small(
                             backgroundColor: const Color(0xFFD8E7FF),
                             foregroundColor: Colors.black,
-                            onPressed: () => _onAddDealership(useLast: true),
+                            onPressed: () => _showAddDealershipDialog(useLast: true),
                             tooltip: loc.translate('use_last_data') ?? 'Use Last',
                             child: const Icon(Icons.history),
                           ),
@@ -353,10 +391,9 @@ class _DealershipListPageState extends State<DealershipListPage> {
                   ],
                 ),
               ),
-              // Right panel
               Expanded(
                 child: Container(
-                  color: const Color(0xFFE4E7ED), // Light brown background
+                  color: const Color(0xFFE4E7ED),
                   child: _selected == null
                       ? Center(
                     child: Text(

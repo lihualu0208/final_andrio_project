@@ -106,12 +106,29 @@ class _DealershipDetailPageState extends State<DealershipDetailPage> {
           const SizedBox(height: 32),
           ElevatedButton(
             onPressed: () {
+              final name = _nameController.text.trim();
+              final address = _addressController.text.trim();
+              final city = _cityController.text.trim();
+              final postalCode = _postalCodeController.text.trim();
+
+              if (name.isEmpty || address.isEmpty || city.isEmpty || postalCode.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        DealershipLocalizations.of(context)!.translate('all_fields_required') ??
+                            'All fields are required'
+                    ),
+                  ),
+                );
+                return;
+              }
+
               final updatedDealership = Dealership(
                 id: widget.dealership.id,
-                name: _nameController.text.trim(),
-                address: _addressController.text.trim(),
-                city: _cityController.text.trim(),
-                postalCode: _postalCodeController.text.trim(),
+                name: name,
+                address: address,
+                city: city,
+                postalCode: postalCode,
               );
               widget.onUpdate(updatedDealership);
             },

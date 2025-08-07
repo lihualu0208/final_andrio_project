@@ -25,5 +25,6 @@
   "close": "Close",
   "edit": "Edit",
   "edit_dealership": "Edit Dealership",
+  "all_fields_required": "All fields are required",
   "select_to_view_details": "Select a dealership to view details"
 }
